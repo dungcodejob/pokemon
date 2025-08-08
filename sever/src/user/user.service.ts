@@ -14,6 +14,14 @@ export class UserService {
     private readonly _em: EntityManager,
   ) {}
 
+  async findOneByAccountId(accountId: string) {
+    return this._repository.findOne({
+      accounts: {
+        id: accountId,
+      },
+    });
+  }
+
   create(data: UserCreateInput): User {
     const user = new User(data);
     return this._repository.create(user);

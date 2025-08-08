@@ -5,23 +5,35 @@ import {
   type JwtConfig,
 } from '@app/configs';
 import { COOKIE_KEY } from '@app/constants';
-import { ResponseMessage } from '@app/decorators';
+import { CurrentUser, Public, ResponseMessage } from '@app/decorators';
+import { User } from '@app/entities';
 import { ErrorResponseDto, Result, SuccessResponseDto } from '@app/models';
+import { UserService } from '@app/user';
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
   Res,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiOkResponse,
+  ApiResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { type FastifyReply } from 'fastify';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto';
 import { RegisterDto } from './dto/register.dto';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 @ApiTags('auth')
 @Controller('auth')
+@UseGuards(JwtAuthGuard)
 export class AuthController {
   private readonly _cookiePath = '/api/auth';
   private readonly _isTesting: boolean;
@@ -31,11 +43,13 @@ export class AuthController {
     @InjectJwtConfig() jwtConfig: JwtConfig,
     @InjectAppConfig() appConfig: AppConfig,
     private readonly _authService: AuthService,
+    private readonly _userService: UserService,
   ) {
     this._refreshTime = jwtConfig.refresh.time;
     this._isTesting = appConfig.testing;
   }
 
+  @Public()
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
     status: HttpStatus.OK,
@@ -52,6 +66,7 @@ export class AuthController {
     return await this._authService.register(registerDto);
   }
 
+  @Public()
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'The user has been logged in successfully',
@@ -77,5 +92,20 @@ export class AuthController {
       path: this._cookiePath,
       expires: new Date(Date.now() + this._refreshTime * 1000),
     });
+  }
+
+  @Get('/me')
+  @ApiOkResponse({
+    type: User,
+    description: 'The user is found and returned.',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'The user is not logged in.',
+  })
+  public async getMe(@CurrentUser('id') id: string) {
+    console.log(id);
+    const user = await this._userService.findOneByAccountId(id);
+
+    return Result.toSingle(user);
   }
 }
