@@ -17,22 +17,34 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "migration:create": "mikro-orm migration:create --config ./src/configs/mikro-orm.config.ts",
+    "migration:up": "mikro-orm migration:up --config ./src/configs/mikro-orm.config.ts",
+    "migration:down": "mikro-orm migration:down --config ./src/configs/mikro-orm.config.ts",
+    "migration:fresh": "mikro-orm migration:fresh --config ./src/configs/mikro-orm.config.ts"
   },
   "dependencies": {
     "@fastify/cors": "^11.1.0",
     "@fastify/static": "^8.2.0",
+    "@mikro-orm/core": "^6.4.16",
+    "@mikro-orm/migrations": "^6.4.16",
+    "@mikro-orm/nestjs": "^6.1.1",
+    "@mikro-orm/postgresql": "^6.4.16",
+    "@mikro-orm/seeder": "^6.4.16",
+    "@mikro-orm/sql-highlighter": "^1.0.1",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-fastify": "^11.1.6",
     "@nestjs/swagger": "^11.1.6",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.18.0",
+    "@mikro-orm/cli": "^6.4.16",
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.1",

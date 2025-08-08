@@ -16,7 +16,9 @@
     "baseUrl": "./",
     "paths": {
       "@app/configs": ["src/configs"],
-      "@app/configs/*": ["src/configs/*"]
+      "@app/configs/*": ["src/configs/*"],
+      "@app/entities": ["src/shared/entities"],
+      "@app/entities/*": ["src/shared/entities/*"]
     },
 
     "incremental": true,
