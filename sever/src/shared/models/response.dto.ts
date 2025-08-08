@@ -15,18 +15,24 @@ export class BaseResponseDto {
 }
 
 export class ErrorResponseDto extends BaseResponseDto {
+  @ApiProperty({
+    default: false,
+  })
   success: false;
+  @ApiProperty()
   errorCode: string;
 }
 
 export class SuccessResponseDto<T> extends BaseResponseDto {
-  @ApiProperty()
+  @ApiProperty({
+    default: true,
+  })
   success: true;
   @ApiProperty()
   result: T;
 }
 
-export type SingleResponseDto<T> = SuccessResponseDto<T>;
+export type SingleResponseDto<T> = SuccessResponseDto<{ data: T }>;
 
 export type ListResponseDto<T> = SuccessResponseDto<{
   items: T[];

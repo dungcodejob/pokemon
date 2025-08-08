@@ -6,12 +6,12 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth';
-import { appConfig, databaseConfig } from './configs';
+import { appConfig, cookieConfig, databaseConfig } from './configs';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      load: [appConfig],
+      load: [appConfig, cookieConfig],
       envFilePath: `./.env.${process.env.NODE_ENV || 'dev'}`,
       isGlobal: true,
     }),

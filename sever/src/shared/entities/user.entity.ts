@@ -7,7 +7,7 @@ import {
   PrimaryKey,
   Property,
 } from '@mikro-orm/core';
-import { v4 } from 'uuid';
+import { v6 } from 'uuid';
 import { Account } from './account.entity';
 
 export enum Role {
@@ -18,7 +18,7 @@ export enum Role {
 @Entity({ repository: () => UserRepository })
 export class User {
   @PrimaryKey()
-  id: string = v4();
+  id: string = v6();
 
   @Property()
   name: string;

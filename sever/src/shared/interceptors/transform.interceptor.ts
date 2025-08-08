@@ -60,10 +60,11 @@ export class TransformInterceptor<T> implements NestInterceptor {
     if (exception instanceof HttpException) {
       status = exception.getStatus();
       message = exception.message;
+      const content = exception.getResponse()['message'] as unknown;
 
-      if (status === HttpStatus.BAD_REQUEST) {
+      if (status === HttpStatus.BAD_REQUEST && Array.isArray(content)) {
         errorCode = 'App.ValidationError';
-        const content = exception.getResponse()['message'] as unknown;
+
         if (Array.isArray(content)) {
           result = {
             meta: { validators: content },

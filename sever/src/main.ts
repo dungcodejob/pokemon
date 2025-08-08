@@ -1,4 +1,5 @@
-import { AppConfig, appConfig } from '@app/configs';
+import { AppConfig, appConfig, CookieConfig, cookieConfig } from '@app/configs';
+import fastifyCookie from '@fastify/cookie';
 import fastifyCors from '@fastify/cors';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
@@ -16,10 +17,15 @@ async function bootstrap() {
   );
 
   const appConfigValues = app.get<AppConfig>(appConfig.KEY);
+  const cookieConfigValues = app.get<CookieConfig>(cookieConfig.KEY);
 
-  app.register(fastifyCors, {
+  await app.register(fastifyCors, {
     credentials: true,
     origin: appConfigValues.client,
+  });
+
+  await app.register(fastifyCookie, {
+    secret: cookieConfigValues.secret,
   });
 
   app.useGlobalPipes(

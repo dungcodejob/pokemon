@@ -36,7 +36,9 @@
       "@app/decorators": ["src/shared/decorators"],
       "@app/decorators/*": ["src/shared/decorators/*"],
       "@app/interceptors": ["src/shared/interceptors"],
-      "@app/interceptors/*": ["src/shared/interceptors/*"]
+      "@app/interceptors/*": ["src/shared/interceptors/*"],
+      "@app/errors": ["src/shared/errors"],
+      "@app/errors/*": ["src/shared/errors/*"]
     },
 
     "incremental": true,

@@ -7,13 +7,13 @@ import {
   PrimaryKey,
   Property,
 } from '@mikro-orm/core';
-import { v4 } from 'uuid';
+import { v6 } from 'uuid';
 import { User } from './user.entity';
 
 @Entity({ repository: () => AccountRepository })
 export class Account {
   @PrimaryKey()
-  id: string = v4();
+  id: string = v6();
 
   @Property({ unique: true })
   username: string;
