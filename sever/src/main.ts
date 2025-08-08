@@ -1,5 +1,6 @@
 import { AppConfig, appConfig } from '@app/configs';
 import fastifyCors from '@fastify/cors';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import {
   FastifyAdapter,
@@ -20,6 +21,19 @@ async function bootstrap() {
     credentials: true,
     origin: appConfigValues.client,
   });
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      exceptionFactory: (errors) => {
+        const result = errors.map((error) => ({
+          property: error.property,
+          constraints: error.constraints,
+        }));
+        return new BadRequestException(result);
+      },
+      stopAtFirstError: true,
+    }),
+  );
 
   const port = appConfigValues.port;
   const domain = appConfigValues.domain;

@@ -1,3 +1,4 @@
+import { UserRepository } from '@app/repositories';
 import {
   Collection,
   Entity,
@@ -14,7 +15,7 @@ export enum Role {
   ADMIN = 'ADMIN',
 }
 
-@Entity()
+@Entity({ repository: () => UserRepository })
 export class User {
   @PrimaryKey()
   id: string = v4();

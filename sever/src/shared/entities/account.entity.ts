@@ -1,6 +1,8 @@
+import { AccountRepository } from '@app/repositories';
 import {
   Cascade,
   Entity,
+  EntityRepositoryType,
   ManyToOne,
   PrimaryKey,
   Property,
@@ -8,7 +10,7 @@ import {
 import { v4 } from 'uuid';
 import { User } from './user.entity';
 
-@Entity()
+@Entity({ repository: () => AccountRepository })
 export class Account {
   @PrimaryKey()
   id: string = v4();
@@ -48,6 +50,8 @@ export class Account {
 
   @Property({ nullable: true })
   deletedAt?: Date;
+
+  [EntityRepositoryType]?: AccountRepository;
 
   constructor({
     username,
