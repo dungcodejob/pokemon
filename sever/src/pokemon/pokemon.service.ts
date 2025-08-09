@@ -1,4 +1,10 @@
-import { ImportStatus, ImportType, Pokemon, PokemonType } from '@app/entities';
+import {
+  FileImport,
+  ImportStatus,
+  ImportType,
+  Pokemon,
+  PokemonType,
+} from '@app/entities';
 import { Errors } from '@app/errors';
 import { ImportService } from '@app/import';
 import { UNIT_OF_WORK, type UnitOfWork } from '@app/repositories';
@@ -65,11 +71,13 @@ export class PokemonService {
     try {
       const newPokemonType = await this.handleImportPokemonType(
         data,
+        fileImport,
         option.isSkipPokemonTypeDuplicates,
       );
       const newPokemon = await this.handleImportPokemon(
         data,
         newPokemonType,
+        fileImport,
         option.isSkipPokemonDuplicates,
       );
 
@@ -108,6 +116,7 @@ export class PokemonService {
 
   private async handleImportPokemonType(
     data: PokemonCsvRowDto[],
+    fileImport: FileImport,
     isSkipDuplicates: boolean,
   ): Promise<PokemonType[]> {
     const pokemonTypes = new Set<string>();
@@ -139,9 +148,11 @@ export class PokemonService {
       newPokemonTypes = Array.from(pokemonTypes);
     }
 
-    const newPokemonTypeEntities = newPokemonTypes.map((type) =>
-      this.createPokemonType({ name: type }),
-    );
+    const newPokemonTypeEntities = newPokemonTypes.map((type) => {
+      const typeEntity = this.createPokemonType({ name: type });
+      typeEntity.importedFrom = fileImport;
+      return typeEntity;
+    });
 
     return [...newPokemonTypeEntities, ...pokemonTypeEntityExists];
   }
@@ -149,6 +160,7 @@ export class PokemonService {
   private async handleImportPokemon(
     data: PokemonCsvRowDto[],
     pokemonTypeEntities: PokemonType[],
+    fileImport: FileImport,
     isSkipDuplicates: boolean,
   ): Promise<Pokemon[]> {
     const pokemonNames = new Set<string>();
@@ -216,7 +228,7 @@ export class PokemonService {
         });
         newPokemonEntity.types.add(pokemonTypeLinkEntity);
       }
-
+      newPokemonEntity.importedFrom = fileImport;
       newPokemonEntities.push(newPokemonEntity);
     }
 

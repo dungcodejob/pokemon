@@ -6,6 +6,7 @@ import {
   PrimaryKey,
   Property,
 } from '@mikro-orm/core';
+import { FileImport } from './file-import.entity';
 import { PokemonType } from './pokemon-type.entity';
 import { Pokemon } from './pokemon.entity';
 
@@ -19,6 +20,9 @@ export class PokemonTypeLink {
 
   @ManyToOne(() => PokemonType)
   type!: PokemonType;
+
+  @ManyToOne(() => FileImport, { nullable: true })
+  importedFrom?: FileImport;
 
   @Property()
   isPrimary!: boolean;

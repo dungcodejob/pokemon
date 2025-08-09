@@ -2,10 +2,12 @@ import { PokemonTypeRepository } from '@app/repositories';
 import {
   Entity,
   EntityRepositoryType,
+  ManyToOne,
   PrimaryKey,
   Property,
 } from '@mikro-orm/core';
 import { v6 } from 'uuid';
+import { FileImport } from './file-import.entity';
 
 @Entity({ repository: () => PokemonTypeRepository })
 export class PokemonType {
@@ -14,6 +16,9 @@ export class PokemonType {
 
   @Property()
   name: string;
+
+  @ManyToOne(() => FileImport, { nullable: true })
+  importedFrom?: FileImport;
 
   @Property({ defaultRaw: 'CURRENT_TIMESTAMP' })
   createdAt?: Date = new Date();
