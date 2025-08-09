@@ -23,7 +23,7 @@ export function providerAppConfig(
       provide: APP_CONFIG,
       useFactory: (): Signal<PKConfig> => {
         const configService = inject(AppConfigService);
-        return configService.config;
+        return configService.$config;
       },
     },
   ];

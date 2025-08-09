@@ -7,7 +7,9 @@
     "baseUrl": "./",
     "paths": {
       "@shell": ["src/app/shell"],
-      "@shell/*": ["src/app/shell/*"]
+      "@shell/*": ["src/app/shell/*"],
+      "@core": ["src/app/core"],
+      "@core/*": ["src/app/core/*"]
     },
 
     "noImplicitOverride": true,

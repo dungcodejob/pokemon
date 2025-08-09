@@ -12,7 +12,7 @@ export class AppConfigService {
   private readonly _configUrl = 'configuration/config.json';
   private readonly _config = signal<PKConfig | null>(null);
 
-  readonly config = computed(() => {
+  readonly $config = computed(() => {
     const value = this._config();
     if (!value) {
       throw new Error('Config not initialized');
