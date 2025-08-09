@@ -1,0 +1,6 @@
+{
+  "mode": "prod",
+  "apiBaseUrl": "https://api.pokemon.com",
+  "appVersion": "1.0.0",
+  "apiKey": "prod-key-456"
+}

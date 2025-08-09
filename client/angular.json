@@ -26,13 +26,17 @@
                 "output": "/assets/"
               }
             ],
-            "styles": [
-              "src/theme.less",
-              "src/styles.css"
-            ]
+            "styles": ["src/theme.less", "src/styles.css"]
           },
           "configurations": {
             "production": {
+              "assets": [
+                {
+                  "glob": "config.json",
+                  "input": "src/configurations/production",
+                  "output": "configuration/"
+                }
+              ],
               "budgets": [
                 {
                   "type": "initial",
@@ -48,6 +52,19 @@
               "outputHashing": "all"
             },
             "development": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.development.ts"
+                }
+              ],
+              "assets": [
+                {
+                  "glob": "config.json",
+                  "input": "src/configurations/development",
+                  "output": "configuration/"
+                }
+              ],
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
@@ -80,26 +97,19 @@
                 "input": "public"
               }
             ],
-            "styles": [
-              "src/styles.css"
-            ]
+            "styles": ["src/styles.css"]
           }
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
           "options": {
-            "lintFilePatterns": [
-              "src/**/*.ts",
-              "src/**/*.html"
-            ]
+            "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
           }
         }
       }
     }
   },
   "cli": {
-    "schematicCollections": [
-      "angular-eslint"
-    ]
+    "schematicCollections": ["angular-eslint"]
   }
 }
