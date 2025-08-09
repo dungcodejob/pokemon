@@ -5,11 +5,13 @@ import {
   EntityRepositoryType,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryKey,
   Property,
 } from '@mikro-orm/core';
 import { v6 } from 'uuid';
 import { FileImport } from './file-import.entity';
+import { PokemonFavorite } from './pokemon-favorite.entity';
 import { PokemonType } from './pokemon-type.entity';
 
 @Entity({ repository: () => PokemonRepository })
@@ -22,6 +24,9 @@ export class Pokemon {
 
   @ManyToMany(() => PokemonType)
   types = new Collection<PokemonType>(this);
+
+  @OneToMany(() => PokemonFavorite, (favorite) => favorite.pokemon)
+  favorites = new Collection<PokemonFavorite>(this);
 
   @ManyToOne(() => FileImport, { nullable: true })
   importedFrom?: FileImport;

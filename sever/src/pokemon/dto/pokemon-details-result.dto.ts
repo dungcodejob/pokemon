@@ -2,7 +2,7 @@ import { Pokemon } from '@app/entities';
 import { ApiProperty } from '@nestjs/swagger';
 import { PokemonTypeResultDto } from './pokemon-type-result.dto';
 
-export class PokemonResultDto {
+export class PokemonDetailsResultDto {
   @ApiProperty()
   id: string;
   @ApiProperty()
@@ -34,18 +34,18 @@ export class PokemonResultDto {
   @ApiProperty()
   ytbUrl: string;
 
-  private constructor(partial: Partial<PokemonResultDto>) {
+  private constructor(partial: Partial<PokemonDetailsResultDto>) {
     Object.assign(this, partial);
   }
-  static create(entity: Pokemon): PokemonResultDto;
-  static create(entity: Pokemon[]): PokemonResultDto[];
+  static create(entity: Pokemon): PokemonDetailsResultDto;
+  static create(entity: Pokemon[]): PokemonDetailsResultDto[];
   static create(
     entity: Pokemon | Pokemon[],
-  ): PokemonResultDto | PokemonResultDto[] {
+  ): PokemonDetailsResultDto | PokemonDetailsResultDto[] {
     if (Array.isArray(entity)) {
       return entity.map((item) => this.create(item));
     }
-    return new PokemonResultDto({
+    return new PokemonDetailsResultDto({
       id: entity.id,
       name: entity.name,
       types: entity.types.map((type) => PokemonTypeResultDto.create(type)),

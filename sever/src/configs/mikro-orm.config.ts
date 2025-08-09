@@ -1,4 +1,11 @@
-import { Account, FileImport, Pokemon, PokemonType, User } from '@app/entities';
+import {
+  Account,
+  FileImport,
+  Pokemon,
+  PokemonFavorite,
+  PokemonType,
+  User,
+} from '@app/entities';
 import { Migrator } from '@mikro-orm/migrations';
 import { PostgreSqlDriver, defineConfig } from '@mikro-orm/postgresql';
 import { SeedManager } from '@mikro-orm/seeder';
@@ -16,9 +23,16 @@ export const databaseConfig = defineConfig({
   user: process.env.DATABASE_USER || 'postgres',
   password: process.env.DATABASE_PASSWORD || 'password',
   dbName: process.env.DATABASE_NAME || 'pokemon',
-  entities: [Account, User, Pokemon, PokemonType, FileImport],
-  entitiesTs: [Account, User, Pokemon, PokemonType, FileImport],
-
+  entities: [Account, User, Pokemon, PokemonType, FileImport, PokemonFavorite],
+  entitiesTs: [
+    Account,
+    User,
+    Pokemon,
+    PokemonType,
+    FileImport,
+    PokemonFavorite,
+  ],
+  debug: NODE_ENV === 'dev',
   highlighter: new SqlHighlighter(),
   extensions: [Migrator, SeedManager],
   migrations: {

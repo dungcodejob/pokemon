@@ -1,10 +1,11 @@
 import * as authentication from './error.authentication';
 import * as file from './error.file';
+import * as pokemon from './error.pokemon';
 import * as user from './error.user';
 
-// TODO: add description to exception
 export const Errors = {
   ...authentication,
   ...user,
   ...file,
+  ...pokemon,
 };

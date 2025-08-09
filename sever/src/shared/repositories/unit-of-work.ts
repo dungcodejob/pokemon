@@ -1,9 +1,17 @@
 import { Inject, Injectable, Provider } from '@nestjs/common';
 
-import { Account, FileImport, Pokemon, PokemonType, User } from '@app/entities';
+import {
+  Account,
+  FileImport,
+  Pokemon,
+  PokemonFavorite,
+  PokemonType,
+  User,
+} from '@app/entities';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { AccountRepository } from './account.repository';
 import { FileImportRepository } from './file-import.repository';
+import { PokemonFavoriteRepository } from './pokemon-favorite.repository';
 import { PokemonTypeRepository } from './pokemon-type.repository';
 import { PokemonRepository } from './pokemon.repository';
 import { UserRepository } from './user.repository';
@@ -16,6 +24,7 @@ export interface UnitOfWork {
   pokemonType: PokemonTypeRepository;
   pokemon: PokemonRepository;
   fileImport: FileImportRepository;
+  pokemonFavorite: PokemonFavoriteRepository;
   save(): Promise<void>;
   start(): Promise<void>;
   commit(): Promise<void>;
@@ -32,6 +41,7 @@ export class UnitOfWorkImpl implements UnitOfWork {
   private _fileImport?: FileImportRepository;
   private _pokemonType?: PokemonTypeRepository;
   private _pokemon?: PokemonRepository;
+  private _pokemonFavorite?: PokemonFavoriteRepository;
 
   constructor() {}
   getEntityManager(): EntityManager {
@@ -76,6 +86,14 @@ export class UnitOfWorkImpl implements UnitOfWork {
     }
 
     return this._fileImport;
+  }
+
+  get pokemonFavorite(): PokemonFavoriteRepository {
+    if (!this._pokemonFavorite) {
+      this._pokemonFavorite = this._em.getRepository(PokemonFavorite);
+    }
+
+    return this._pokemonFavorite;
   }
 
   save(): Promise<void> {

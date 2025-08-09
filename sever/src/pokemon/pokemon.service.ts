@@ -4,14 +4,19 @@ import {
   ImportStatus,
   ImportType,
   Pokemon,
+  PokemonFavorite,
   PokemonType,
+  User,
 } from '@app/entities';
 import { Errors } from '@app/errors';
 import { ImportService } from '@app/import';
+import { PaginationDto } from '@app/models';
 import { UNIT_OF_WORK, type UnitOfWork } from '@app/repositories';
+import { UserService } from '@app/user';
 import { FilterQuery, FindOptions } from '@mikro-orm/postgresql';
 import { Inject, Injectable } from '@nestjs/common';
 import { PokemonImportOptionDto } from './dto';
+import { PokemonDetailsResultDto } from './dto/pokemon-details-result.dto';
 import { PokemonFilterDto } from './dto/pokemon-filter.dto';
 import { PokemonResultDto } from './dto/pokemon-result.dto';
 import { PokemonCsvRowDto } from './models';
@@ -22,6 +27,7 @@ export class PokemonService {
   constructor(
     @Inject(UNIT_OF_WORK) private readonly _unitOfWork: UnitOfWork,
     private readonly _importService: ImportService,
+    private readonly _userService: UserService,
   ) {}
 
   async import(
@@ -104,7 +110,7 @@ export class PokemonService {
     return fileImport;
   }
 
-  async findAll(filter: PokemonFilterDto): Promise<PokemonResultDto[]> {
+  async find(filter: PokemonFilterDto): Promise<PokemonResultDto[]> {
     const query = this.createFilterQuery(filter);
     const options = this.createFilterOptions(filter);
 
@@ -112,9 +118,60 @@ export class PokemonService {
     return PokemonResultDto.create(entities);
   }
 
+  async findOne(id: string): Promise<PokemonDetailsResultDto> {
+    const entity = await this._unitOfWork.pokemon.findOne(
+      {
+        id,
+        deleteFlag: false,
+      },
+      {
+        populate: ['types'],
+      },
+    );
+
+    if (!entity) {
+      throw Errors.Pokemon.NotFound;
+    }
+    return PokemonDetailsResultDto.create(entity);
+  }
+
   async count(filter: PokemonFilterDto): Promise<number> {
     const query = this.createFilterQuery(filter);
     return this._unitOfWork.pokemon.count(query);
+  }
+
+  async findTypes(): Promise<PokemonType[]> {
+    return this._unitOfWork.pokemonType.find({
+      deleteFlag: false,
+    });
+  }
+
+  async findFavorites(
+    accountId: string,
+    pagination: PaginationDto,
+  ): Promise<PokemonResultDto[]> {
+    const user = await this._userService.findOneByAccountId(accountId);
+    if (!user) {
+      throw Errors.User.UserNotFound;
+    }
+    const entities = await this._unitOfWork.pokemon.find(
+      {
+        favorites: {
+          user: {
+            id: user.id,
+          },
+          deleteFlag: false,
+        },
+        deleteFlag: false,
+      },
+      {
+        populate: ['types'],
+        limit: pagination.pageSize,
+        offset: (pagination.currentPage - 1) * pagination.pageSize,
+      },
+    );
+
+    return PokemonResultDto.create(entities);
   }
 
   create(data: PokemonCreateInput): Pokemon {
@@ -125,6 +182,42 @@ export class PokemonService {
   createPokemonType(data: PokemonTypeCreateInput): PokemonType {
     const account = new PokemonType(data);
     return this._unitOfWork.pokemonType.create(account);
+  }
+
+  async toggleFavorite(accountId: string, pokemonId: string) {
+    const user = await this._userService.findOneByAccountId(accountId);
+    if (!user) {
+      throw Errors.User.UserNotFound;
+    }
+    const favorite = await this._unitOfWork.pokemonFavorite.findOne({
+      pokemon: {
+        id: pokemonId,
+      },
+      user: {
+        id: user.id,
+      },
+      deleteFlag: false,
+    });
+
+    if (favorite) {
+      await this.unmarkAsFavorite(favorite);
+    } else {
+      await this.markAsFavorite(pokemonId, user);
+    }
+    await this._unitOfWork.save();
+  }
+
+  private async markAsFavorite(pokemonId: string, user: User) {
+    const pokemon = this._unitOfWork.pokemon.getReference(pokemonId);
+    const favorite = new PokemonFavorite();
+    favorite.pokemon = pokemon;
+    favorite.user = user;
+
+    return this._unitOfWork.pokemonFavorite.create(favorite);
+  }
+
+  private async unmarkAsFavorite(favorite: PokemonFavorite) {
+    favorite.deleteFlag = true;
   }
 
   private createFilterQuery(filter: PokemonFilterDto): FilterQuery<Pokemon> {

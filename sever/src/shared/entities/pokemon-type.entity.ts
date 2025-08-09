@@ -23,6 +23,7 @@ export class PokemonType {
 
   @ManyToMany(() => Pokemon, (pokemon) => pokemon.types, {
     cascade: [Cascade.PERSIST, Cascade.REMOVE],
+    mappedBy: 'types',
   })
   pokemons = new Collection<Pokemon>(this);
 
