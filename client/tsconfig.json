@@ -4,6 +4,12 @@
   "compileOnSave": false,
   "compilerOptions": {
     "strict": true,
+    "baseUrl": "./",
+    "paths": {
+      "@shell": ["src/app/shell"],
+      "@shell/*": ["src/app/shell/*"]
+    },
+
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
