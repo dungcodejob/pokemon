@@ -29,6 +29,7 @@ export interface UnitOfWork {
   start(): Promise<void>;
   commit(): Promise<void>;
   rollback(): Promise<void>;
+  getEntityManager(): EntityManager;
 }
 
 @Injectable()
@@ -43,6 +44,9 @@ export class UnitOfWorkImpl implements UnitOfWork {
   private _pokemonTypeLink?: PokemonTypeLinkRepository;
 
   constructor() {}
+  getEntityManager(): EntityManager {
+    return this._em;
+  }
 
   get user(): UserRepository {
     if (!this._user) {

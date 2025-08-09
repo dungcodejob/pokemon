@@ -1,3 +1,4 @@
+import { DEFAULT_CURRENT_PAGE, DEFAULT_PAGE_SIZE } from '@app/constants';
 import {
   FileImport,
   ImportStatus,
@@ -8,8 +9,10 @@ import {
 import { Errors } from '@app/errors';
 import { ImportService } from '@app/import';
 import { UNIT_OF_WORK, type UnitOfWork } from '@app/repositories';
+import { FilterQuery, FindOptions } from '@mikro-orm/postgresql';
 import { Inject, Injectable } from '@nestjs/common';
 import { PokemonImportOptionDto } from './dto';
+import { PokemonFilterDto } from './dto/pokemon-filter.dto';
 import { PokemonCsvRowDto } from './models';
 type PokemonCreateInput = ConstructorParameters<typeof Pokemon>[0];
 type PokemonTypeCreateInput = ConstructorParameters<typeof PokemonType>[0];
@@ -100,6 +103,18 @@ export class PokemonService {
     return fileImport;
   }
 
+  async findAll(filter: PokemonFilterDto) {
+    const query = this.createFilterQuery(filter);
+    const options = this.createFilterOptions(filter);
+
+    return this._unitOfWork.pokemon.find(query, options);
+  }
+
+  async count(filter: PokemonFilterDto) {
+    const query = this.createFilterQuery(filter);
+    return this._unitOfWork.pokemon.count(query);
+  }
+
   create(data: PokemonCreateInput): Pokemon {
     const account = new Pokemon(data);
     return this._unitOfWork.pokemon.create(account);
@@ -108,6 +123,74 @@ export class PokemonService {
   createPokemonType(data: PokemonTypeCreateInput): PokemonType {
     const account = new PokemonType(data);
     return this._unitOfWork.pokemonType.create(account);
+  }
+
+  private createFilterQuery(filter: PokemonFilterDto) {
+    const query: FilterQuery<Pokemon> = {
+      deleteFlag: false,
+    };
+
+    if (filter.name) {
+      query.name = {
+        $like: `%${filter.name}%`,
+      };
+    }
+
+    if (filter.typeIds) {
+      query.types = {
+        type: {
+          id: {
+            $in: filter.typeIds,
+          },
+        },
+      };
+    }
+
+    if (filter.ranges) {
+      for (const range of filter.ranges) {
+        if (range.min) {
+          query[range.filterBy] = {
+            $gte: range.min,
+          };
+        }
+        if (range.max) {
+          query[range.filterBy] = {
+            $lte: range.max,
+          };
+        }
+        if (range.exact) {
+          query[range.filterBy] = {
+            $eq: range.exact,
+          };
+        }
+      }
+    }
+    if (filter.legendary) {
+      query.legendary = filter.legendary;
+    }
+
+    return query;
+  }
+
+  private createFilterOptions(filter: PokemonFilterDto) {
+    const options: FindOptions<Pokemon, 'types', '*', never> = {
+      populate: ['types'],
+    };
+
+    if (filter.sort) {
+      const { sortBy, order } = filter.sort;
+      options.orderBy = {
+        [sortBy]: order,
+      };
+    }
+
+    const currentPage = filter.pagination?.currentPage || DEFAULT_CURRENT_PAGE;
+    const pageSize = filter.pagination?.pageSize || DEFAULT_PAGE_SIZE;
+
+    options.limit = pageSize;
+    options.offset = (currentPage - 1) * pageSize;
+
+    return options;
   }
 
   async flush(): Promise<void> {
