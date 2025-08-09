@@ -1,5 +1,10 @@
 import { RESPONSE_KEY } from '@app/constants';
-import { SuccessResponseDto, ValidatorResponseDto } from '@app/models';
+import {
+  FileImportValidatorException,
+  SuccessResponseDto,
+  ValidatorException,
+  ValidatorResponseDto,
+} from '@app/models';
 import { DriverException } from '@mikro-orm/core';
 import {
   CallHandler,
@@ -60,18 +65,17 @@ export class TransformInterceptor<T> implements NestInterceptor {
     if (exception instanceof HttpException) {
       status = exception.getStatus();
       message = exception.message;
-      const content = exception.getResponse()['message'] as unknown;
+      errorCode = exception.message;
 
-      if (status === HttpStatus.BAD_REQUEST && Array.isArray(content)) {
-        errorCode = 'App.ValidationError';
+      if (
+        exception instanceof ValidatorException ||
+        exception instanceof FileImportValidatorException
+      ) {
+        errorCode = exception.message;
 
-        if (Array.isArray(content)) {
-          result = {
-            meta: { validators: content },
-          };
-        }
-      } else {
-        errorCode = exception.getResponse()['message'] as string;
+        result = {
+          meta: exception.meta,
+        };
       }
 
       if (status === HttpStatus.UNAUTHORIZED) {

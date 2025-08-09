@@ -1,14 +1,14 @@
 import { REQUEST_KEY } from '@app/constants';
-import { User } from '@app/entities';
+import { Account } from '@app/entities';
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
-type UserRecord = keyof User;
+type UserRecord = keyof Account;
 
-export const CurrentUser = createParamDecorator(
+export const CurrentAccount = createParamDecorator(
   (data: UserRecord, context: ExecutionContext) => {
     const request = context.switchToHttp().getRequest();
     return data
-      ? request[REQUEST_KEY.CURRENT_USER]?.[data]
-      : request[REQUEST_KEY.CURRENT_USER];
+      ? request[REQUEST_KEY.CURRENT_ACCOUNT]?.[data]
+      : request[REQUEST_KEY.CURRENT_ACCOUNT];
   },
 );

@@ -1,4 +1,4 @@
-import { METADATA_KEY } from '@app/constants';
+import { METADATA_KEY, REQUEST_KEY } from '@app/constants';
 import { isNil } from '@app/utils';
 import {
   CanActivate,
@@ -38,7 +38,7 @@ export class JwtAuthGuard implements CanActivate {
       token,
       TokenTypeEnum.ACCESS,
     );
-    request.user = { id };
+    request[REQUEST_KEY.CURRENT_ACCOUNT] = { id };
 
     return true;
   }

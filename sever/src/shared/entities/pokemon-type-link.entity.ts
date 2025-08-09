@@ -1,8 +1,15 @@
-import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/core';
+import { PokemonTypeLinkRepository } from '@app/repositories';
+import {
+  Entity,
+  EntityRepositoryType,
+  ManyToOne,
+  PrimaryKey,
+  Property,
+} from '@mikro-orm/core';
 import { PokemonType } from './pokemon-type.entity';
 import { Pokemon } from './pokemon.entity';
 
-@Entity()
+@Entity({ repository: () => PokemonTypeLinkRepository })
 export class PokemonTypeLink {
   @PrimaryKey()
   id!: number;
@@ -22,9 +29,11 @@ export class PokemonTypeLink {
   @Property({ onUpdate: () => new Date() })
   updatedAt?: Date = new Date();
 
-  @Property()
-  deleteFlag: boolean = false;
+  @Property({ default: false })
+  deleteFlag?: boolean = false;
 
   @Property({ nullable: true })
   deletedAt?: Date;
+
+  [EntityRepositoryType]?: PokemonTypeLinkRepository;
 }

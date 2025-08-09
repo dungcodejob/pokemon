@@ -1,17 +1,19 @@
 import { AppConfig, appConfig, CookieConfig, cookieConfig } from '@app/configs';
+import { ValidatorException } from '@app/models';
 import fastifyCookie from '@fastify/cookie';
 import fastifyCors from '@fastify/cors';
 import fastifyCsrfProtection from '@fastify/csrf-protection';
 import fastifyHelmet from '@fastify/helmet';
-import { BadRequestException, ValidationPipe } from '@nestjs/common';
+import fastifyMultipart from '@fastify/multipart';
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { join } from 'path';
 import { AppModule } from './app.module';
-
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
@@ -20,7 +22,6 @@ async function bootstrap() {
 
   const appConfigValues = app.get<AppConfig>(appConfig.KEY);
   const cookieConfigValues = app.get<CookieConfig>(cookieConfig.KEY);
-
   await app.register(fastifyCors, {
     credentials: true,
     origin: appConfigValues.client,
@@ -31,7 +32,9 @@ async function bootstrap() {
   });
   await app.register(fastifyHelmet);
   await app.register(fastifyCsrfProtection, { cookieOpts: { signed: true } });
+  await app.register(fastifyMultipart);
 
+  app.useStaticAssets({ root: join(__dirname, '../../fastify-file-upload') });
   app.useGlobalPipes(
     new ValidationPipe({
       exceptionFactory: (errors) => {
@@ -39,7 +42,7 @@ async function bootstrap() {
           property: error.property,
           constraints: error.constraints,
         }));
-        return new BadRequestException(result);
+        return new ValidatorException(result);
       },
       stopAtFirstError: true,
     }),

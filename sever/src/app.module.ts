@@ -5,12 +5,10 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ThrottlerModule } from '@nestjs/throttler';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { AuthModule, JwtAuthGuard } from './auth';
 import { appConfig, cookieConfig, databaseConfig } from './configs';
 import { ThrottlerConfig } from './configs/throttler.config';
-
+import { PokemonModule } from './pokemon';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -30,10 +28,10 @@ import { ThrottlerConfig } from './configs/throttler.config';
       isGlobal: true,
     }),
     AuthModule,
+    PokemonModule,
   ],
-  controllers: [AppController],
+  controllers: [],
   providers: [
-    AppService,
     {
       provide: APP_INTERCEPTOR,
       useClass: TransformInterceptor,

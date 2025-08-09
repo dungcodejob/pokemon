@@ -1,4 +1,6 @@
 export * from './account.repository';
+export * from './file-import.repository';
+export * from './pokemon-type-link.repository';
 export * from './pokemon-type.repository';
 export * from './pokemon.repository';
 export * from './unit-of-work';

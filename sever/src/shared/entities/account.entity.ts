@@ -45,8 +45,8 @@ export class Account {
   @ManyToOne(() => User, { cascade: [Cascade.REMOVE] })
   user: User;
 
-  @Property()
-  deleteFlag: boolean = false;
+  @Property({ default: false })
+  deleteFlag?: boolean = false;
 
   @Property({ nullable: true })
   deletedAt?: Date;

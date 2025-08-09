@@ -5,7 +5,12 @@ import {
   type JwtConfig,
 } from '@app/configs';
 import { COOKIE_KEY } from '@app/constants';
-import { CurrentUser, Origin, Public, ResponseMessage } from '@app/decorators';
+import {
+  CurrentAccount,
+  Origin,
+  Public,
+  ResponseMessage,
+} from '@app/decorators';
 import { User } from '@app/entities';
 import { Errors } from '@app/errors';
 import { ErrorResponseDto, Result, SuccessResponseDto } from '@app/models';
@@ -125,7 +130,7 @@ export class AuthController {
   @ApiUnauthorizedResponse({
     description: 'The user is not logged in.',
   })
-  public async getMe(@CurrentUser('id') id: string) {
+  public async getMe(@CurrentAccount('id') id: string) {
     const user = await this._userService.findOneByAccountId(id);
 
     return Result.toSingle(user);

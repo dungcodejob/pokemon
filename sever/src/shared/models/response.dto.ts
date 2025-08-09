@@ -1,3 +1,4 @@
+import { BadRequestException } from '@nestjs/common';
 import { ApiProperty } from '@nestjs/swagger';
 import { PaginationMetaDto } from './pagination-meta.dto';
 
@@ -44,13 +45,50 @@ export type PaginationResponseDto<T> = SuccessResponseDto<{
   meta: { pagination: PaginationMetaDto };
 }>;
 
+export type ValidatorErrorDto = {
+  property: string;
+  constraints?: { [key: string]: string };
+};
+
 export type ValidatorResponseDto = ErrorResponseDto & {
   result: {
     meta: {
-      validators: {
-        property: string;
-        constraints: { [key: string]: string };
-      }[];
+      validators: ValidatorErrorDto[];
     };
   } | null;
 };
+
+export class ValidatorException extends BadRequestException {
+  meta: { validators: ValidatorErrorDto[] };
+  constructor(validators: ValidatorErrorDto[]) {
+    super({
+      message: 'App.ValidationError',
+    });
+    this.meta = { validators };
+  }
+}
+
+export type FileImportValidatorErrorDto = {
+  index: number;
+  property: string;
+  constraints?: { [key: string]: string };
+};
+
+export type FileImportResponseDto = SuccessResponseDto<{
+  result: {
+    meta: {
+      failureCount: number;
+      validators: FileImportValidatorErrorDto[];
+    };
+  } | null;
+}>;
+
+export class FileImportValidatorException extends BadRequestException {
+  meta: { failureCount: number; validators: FileImportValidatorErrorDto[] };
+  constructor(validators: FileImportValidatorErrorDto[]) {
+    super({
+      message: 'App.ValidationError',
+    });
+    this.meta = { failureCount: validators.length, validators };
+  }
+}

@@ -38,7 +38,9 @@
       "@app/interceptors": ["src/shared/interceptors"],
       "@app/interceptors/*": ["src/shared/interceptors/*"],
       "@app/errors": ["src/shared/errors"],
-      "@app/errors/*": ["src/shared/errors/*"]
+      "@app/errors/*": ["src/shared/errors/*"],
+      "@app/import": ["src/import"],
+      "@app/import/*": ["src/import/*"]
     },
 
     "incremental": true,

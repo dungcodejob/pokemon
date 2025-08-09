@@ -3,7 +3,7 @@ export const RESPONSE_KEY = {
 } as const;
 
 export const REQUEST_KEY = {
-  CURRENT_USER: 'user',
+  CURRENT_ACCOUNT: 'account',
 } as const;
 
 export const COOKIE_KEY = {

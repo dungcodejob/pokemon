@@ -21,8 +21,8 @@ export class PokemonType {
   @Property({ onUpdate: () => new Date() })
   updatedAt?: Date = new Date();
 
-  @Property()
-  deleteFlag: boolean = false;
+  @Property({ default: false })
+  deleteFlag?: boolean = false;
 
   @Property({ nullable: true })
   deletedAt?: Date;
