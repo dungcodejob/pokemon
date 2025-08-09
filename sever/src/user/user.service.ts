@@ -1,21 +1,15 @@
 import { User } from '@app/entities';
-import { UserRepository } from '@app/repositories';
-import { InjectRepository } from '@mikro-orm/nestjs';
-import { EntityManager } from '@mikro-orm/postgresql';
-import { Injectable } from '@nestjs/common';
+import { UNIT_OF_WORK, type UnitOfWork } from '@app/repositories';
+import { Inject, Injectable } from '@nestjs/common';
 
 type UserCreateInput = ConstructorParameters<typeof User>[0];
 
 @Injectable()
 export class UserService {
-  constructor(
-    @InjectRepository(User)
-    private readonly _repository: UserRepository,
-    private readonly _em: EntityManager,
-  ) {}
+  constructor(@Inject(UNIT_OF_WORK) private readonly _unitOfWork: UnitOfWork) {}
 
   async findOneByAccountId(accountId: string) {
-    return this._repository.findOne({
+    return this._unitOfWork.user.findOne({
       accounts: {
         id: accountId,
       },
@@ -24,10 +18,10 @@ export class UserService {
 
   create(data: UserCreateInput): User {
     const user = new User(data);
-    return this._repository.create(user);
+    return this._unitOfWork.user.create(user);
   }
 
   flush(): Promise<void> {
-    return this._em.flush();
+    return this._unitOfWork.save();
   }
 }

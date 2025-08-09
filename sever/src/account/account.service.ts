@@ -1,23 +1,18 @@
 import { Account } from '@app/entities';
 import { Errors } from '@app/errors';
-import { AccountRepository } from '@app/repositories';
+import { UNIT_OF_WORK, type UnitOfWork } from '@app/repositories';
 import { isNil } from '@app/utils';
-import { InjectRepository } from '@mikro-orm/nestjs';
-import { EntityManager, FilterQuery } from '@mikro-orm/postgresql';
-import { Injectable } from '@nestjs/common';
+import { FilterQuery } from '@mikro-orm/postgresql';
+import { Inject, Injectable } from '@nestjs/common';
 
 type AccountCreateInput = ConstructorParameters<typeof Account>[0];
 
 @Injectable()
 export class AccountService {
-  constructor(
-    @InjectRepository(Account)
-    protected readonly _repository: AccountRepository,
-    protected readonly _em: EntityManager,
-  ) {}
+  constructor(@Inject(UNIT_OF_WORK) private readonly _unitOfWork: UnitOfWork) {}
 
   async findOneByCredentials(id: string, version: number) {
-    const account = await this._repository.findOne(
+    const account = await this._unitOfWork.account.findOne(
       {
         id,
         version,
@@ -37,7 +32,7 @@ export class AccountService {
   }
 
   async findOneById(id: string) {
-    return this._repository.findOne(
+    return this._unitOfWork.account.findOne(
       {
         id,
       },
@@ -46,7 +41,7 @@ export class AccountService {
   }
 
   async findOneByUsername(username: string) {
-    return this._repository.findOne(
+    return this._unitOfWork.account.findOne(
       {
         username,
       },
@@ -55,7 +50,7 @@ export class AccountService {
   }
 
   async findOneByEmail(email: string) {
-    return this._repository.findOne(
+    return this._unitOfWork.account.findOne(
       {
         email,
       },
@@ -64,15 +59,15 @@ export class AccountService {
   }
 
   count(where: FilterQuery<Account>): Promise<number> {
-    return this._repository.count(where);
+    return this._unitOfWork.account.count(where);
   }
 
   create(data: AccountCreateInput): Account {
     const account = new Account(data);
-    return this._repository.create(account);
+    return this._unitOfWork.account.create(account);
   }
 
   flush(): Promise<void> {
-    return this._em.flush();
+    return this._unitOfWork.save();
   }
 }

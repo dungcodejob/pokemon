@@ -26,14 +26,14 @@ export class User {
   @Enum(() => Role)
   role: Role = Role.USER;
 
+  @OneToMany(() => Account, (account) => account.user)
+  accounts = new Collection<Account>(this);
+
   @Property({ defaultRaw: 'CURRENT_TIMESTAMP' })
   createdAt?: Date = new Date();
 
   @Property({ onUpdate: () => new Date() })
   updatedAt?: Date = new Date();
-
-  @OneToMany(() => Account, (account) => account.user)
-  accounts = new Collection<Account>(this);
 
   @Property()
   deleteFlag: boolean = false;
