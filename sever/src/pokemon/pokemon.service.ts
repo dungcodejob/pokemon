@@ -13,6 +13,7 @@ import { FilterQuery, FindOptions } from '@mikro-orm/postgresql';
 import { Inject, Injectable } from '@nestjs/common';
 import { PokemonImportOptionDto } from './dto';
 import { PokemonFilterDto } from './dto/pokemon-filter.dto';
+import { PokemonResultDto } from './dto/pokemon-result.dto';
 import { PokemonCsvRowDto } from './models';
 type PokemonCreateInput = ConstructorParameters<typeof Pokemon>[0];
 type PokemonTypeCreateInput = ConstructorParameters<typeof PokemonType>[0];
@@ -27,7 +28,7 @@ export class PokemonService {
     file: Express.Multer.File,
     accountId: string,
     option: PokemonImportOptionDto,
-  ) {
+  ): Promise<FileImport> {
     const fileImport = await this._importService.createFileImport(
       file,
       accountId,
@@ -103,14 +104,15 @@ export class PokemonService {
     return fileImport;
   }
 
-  async findAll(filter: PokemonFilterDto) {
+  async findAll(filter: PokemonFilterDto): Promise<PokemonResultDto[]> {
     const query = this.createFilterQuery(filter);
     const options = this.createFilterOptions(filter);
 
-    return this._unitOfWork.pokemon.find(query, options);
+    const entities = await this._unitOfWork.pokemon.find(query, options);
+    return PokemonResultDto.create(entities);
   }
 
-  async count(filter: PokemonFilterDto) {
+  async count(filter: PokemonFilterDto): Promise<number> {
     const query = this.createFilterQuery(filter);
     return this._unitOfWork.pokemon.count(query);
   }
@@ -125,7 +127,7 @@ export class PokemonService {
     return this._unitOfWork.pokemonType.create(account);
   }
 
-  private createFilterQuery(filter: PokemonFilterDto) {
+  private createFilterQuery(filter: PokemonFilterDto): FilterQuery<Pokemon> {
     const query: FilterQuery<Pokemon> = {
       deleteFlag: false,
     };
@@ -138,10 +140,8 @@ export class PokemonService {
 
     if (filter.typeIds) {
       query.types = {
-        type: {
-          id: {
-            $in: filter.typeIds,
-          },
+        id: {
+          $in: filter.typeIds,
         },
       };
     }
@@ -172,7 +172,9 @@ export class PokemonService {
     return query;
   }
 
-  private createFilterOptions(filter: PokemonFilterDto) {
+  private createFilterOptions(
+    filter: PokemonFilterDto,
+  ): FindOptions<Pokemon, 'types', '*', never> {
     const options: FindOptions<Pokemon, 'types', '*', never> = {
       populate: ['types'],
     };
@@ -296,20 +298,10 @@ export class PokemonService {
         (type) => type.name === item.type2,
       );
       if (type1) {
-        const pokemonTypeLinkEntity = this._unitOfWork.pokemonTypeLink.create({
-          pokemon: newPokemonEntity,
-          type: type1,
-          isPrimary: true,
-        });
-        newPokemonEntity.types.add(pokemonTypeLinkEntity);
+        newPokemonEntity.types.add(type1);
       }
       if (type2) {
-        const pokemonTypeLinkEntity = this._unitOfWork.pokemonTypeLink.create({
-          pokemon: newPokemonEntity,
-          type: type2,
-          isPrimary: false,
-        });
-        newPokemonEntity.types.add(pokemonTypeLinkEntity);
+        newPokemonEntity.types.add(type2);
       }
       newPokemonEntity.importedFrom = fileImport;
       newPokemonEntities.push(newPokemonEntity);

@@ -1,7 +1,7 @@
 import { PaginationDto, RangeFilterDto, SortDto } from '@app/models';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
-import { IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 export enum PokemonRangeFilterField {
   Total = 'total',
@@ -41,7 +41,7 @@ export class PokemonFilterDto {
 
   @ApiPropertyOptional({ description: 'Filter by types' })
   @IsOptional()
-  @IsString()
+  @IsArray()
   typeIds?: string[];
 
   @ApiPropertyOptional({

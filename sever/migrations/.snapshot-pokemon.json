@@ -799,15 +799,6 @@
     },
     {
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "unsigned": false,
-          "autoincrement": true,
-          "primary": true,
-          "nullable": false,
-          "mappedType": "integer"
-        },
         "pokemon_id": {
           "name": "pokemon_id",
           "type": "varchar(255)",
@@ -818,8 +809,8 @@
           "length": 255,
           "mappedType": "string"
         },
-        "type_id": {
-          "name": "type_id",
+        "pokemon_type_id": {
+          "name": "pokemon_type_id",
           "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
@@ -827,77 +818,18 @@
           "nullable": false,
           "length": 255,
           "mappedType": "string"
-        },
-        "imported_from_id": {
-          "name": "imported_from_id",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 255,
-          "mappedType": "string"
-        },
-        "is_primary": {
-          "name": "is_primary",
-          "type": "boolean",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "mappedType": "boolean"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamptz",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 6,
-          "default": "CURRENT_TIMESTAMP",
-          "mappedType": "datetime"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamptz",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 6,
-          "mappedType": "datetime"
-        },
-        "delete_flag": {
-          "name": "delete_flag",
-          "type": "boolean",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "default": "false",
-          "mappedType": "boolean"
-        },
-        "deleted_at": {
-          "name": "deleted_at",
-          "type": "timestamptz",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 6,
-          "mappedType": "datetime"
         }
       },
-      "name": "pokemon_type_link",
+      "name": "pokemon_types",
       "schema": "public",
       "indexes": [
         {
-          "keyName": "pokemon_type_link_pkey",
+          "keyName": "pokemon_types_pkey",
           "columnNames": [
-            "id"
+            "pokemon_id",
+            "pokemon_type_id"
           ],
-          "composite": false,
+          "composite": true,
           "constraint": true,
           "primary": true,
           "unique": true
@@ -905,41 +837,30 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "pokemon_type_link_pokemon_id_foreign": {
-          "constraintName": "pokemon_type_link_pokemon_id_foreign",
+        "pokemon_types_pokemon_id_foreign": {
+          "constraintName": "pokemon_types_pokemon_id_foreign",
           "columnNames": [
             "pokemon_id"
           ],
-          "localTableName": "public.pokemon_type_link",
+          "localTableName": "public.pokemon_types",
           "referencedColumnNames": [
             "id"
           ],
           "referencedTableName": "public.pokemon",
+          "deleteRule": "cascade",
           "updateRule": "cascade"
         },
-        "pokemon_type_link_type_id_foreign": {
-          "constraintName": "pokemon_type_link_type_id_foreign",
+        "pokemon_types_pokemon_type_id_foreign": {
+          "constraintName": "pokemon_types_pokemon_type_id_foreign",
           "columnNames": [
-            "type_id"
+            "pokemon_type_id"
           ],
-          "localTableName": "public.pokemon_type_link",
+          "localTableName": "public.pokemon_types",
           "referencedColumnNames": [
             "id"
           ],
           "referencedTableName": "public.pokemon_type",
-          "updateRule": "cascade"
-        },
-        "pokemon_type_link_imported_from_id_foreign": {
-          "constraintName": "pokemon_type_link_imported_from_id_foreign",
-          "columnNames": [
-            "imported_from_id"
-          ],
-          "localTableName": "public.pokemon_type_link",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.file_import",
-          "deleteRule": "set null",
+          "deleteRule": "cascade",
           "updateRule": "cascade"
         }
       },

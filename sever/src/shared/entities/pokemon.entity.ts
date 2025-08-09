@@ -1,17 +1,16 @@
 import { PokemonRepository } from '@app/repositories';
 import {
-  Cascade,
   Collection,
   Entity,
   EntityRepositoryType,
+  ManyToMany,
   ManyToOne,
-  OneToMany,
   PrimaryKey,
   Property,
 } from '@mikro-orm/core';
 import { v6 } from 'uuid';
 import { FileImport } from './file-import.entity';
-import { PokemonTypeLink } from './pokemon-type-link.entity';
+import { PokemonType } from './pokemon-type.entity';
 
 @Entity({ repository: () => PokemonRepository })
 export class Pokemon {
@@ -21,10 +20,8 @@ export class Pokemon {
   @Property()
   name: string;
 
-  @OneToMany(() => PokemonTypeLink, (pt) => pt.pokemon, {
-    cascade: [Cascade.PERSIST, Cascade.REMOVE],
-  })
-  types = new Collection<PokemonTypeLink>(this);
+  @ManyToMany(() => PokemonType)
+  types = new Collection<PokemonType>(this);
 
   @ManyToOne(() => FileImport, { nullable: true })
   importedFrom?: FileImport;
