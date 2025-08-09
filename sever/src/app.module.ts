@@ -1,12 +1,15 @@
 import { TransformInterceptor } from '@app/interceptors';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
+import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AuthModule } from './auth';
+import { AuthModule, JwtAuthGuard } from './auth';
 import { appConfig, cookieConfig, databaseConfig } from './configs';
+import { ThrottlerConfig } from './configs/throttler.config';
 
 @Module({
   imports: [
@@ -19,6 +22,13 @@ import { appConfig, cookieConfig, databaseConfig } from './configs';
       imports: [ConfigModule],
       useFactory: () => databaseConfig,
     }),
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      useClass: ThrottlerConfig,
+    }),
+    CacheModule.register({
+      isGlobal: true,
+    }),
     AuthModule,
   ],
   controllers: [AppController],
@@ -27,6 +37,10 @@ import { appConfig, cookieConfig, databaseConfig } from './configs';
     {
       provide: APP_INTERCEPTOR,
       useClass: TransformInterceptor,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
     },
   ],
 })

@@ -5,10 +5,12 @@ import {
   type JwtConfig,
 } from '@app/configs';
 import { COOKIE_KEY } from '@app/constants';
-import { CurrentUser, Public, ResponseMessage } from '@app/decorators';
+import { CurrentUser, Origin, Public, ResponseMessage } from '@app/decorators';
 import { User } from '@app/entities';
+import { Errors } from '@app/errors';
 import { ErrorResponseDto, Result, SuccessResponseDto } from '@app/models';
 import { UserService } from '@app/user';
+import { isNil } from '@app/utils';
 import {
   Body,
   Controller,
@@ -16,8 +18,8 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Req,
   Res,
-  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -26,14 +28,12 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { type FastifyReply } from 'fastify';
+import { type FastifyReply, type FastifyRequest } from 'fastify';
 import { AuthService } from './auth.service';
-import { LoginDto } from './dto';
+import { AuthResultDto, LoginDto, RefreshAccessDto } from './dto';
 import { RegisterDto } from './dto/register.dto';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
 @ApiTags('auth')
 @Controller('auth')
-@UseGuards(JwtAuthGuard)
 export class AuthController {
   private readonly _cookiePath = '/api/auth';
   private readonly _isTesting: boolean;
@@ -70,7 +70,7 @@ export class AuthController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'The user has been logged in successfully',
-    type: SuccessResponseDto,
+    type: SuccessResponseDto<AuthResultDto>,
   })
   @ResponseMessage('The user has been registered successfully')
   @Post('login')
@@ -79,6 +79,74 @@ export class AuthController {
     this.saveRefreshCookie(res, result.refreshToken);
 
     return Result.toSingle(result);
+  }
+
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'The access token has been refreshed successfully',
+    type: SuccessResponseDto<AuthResultDto>,
+  })
+  @ResponseMessage('The access token has been refreshed successfully')
+  @Post('refresh')
+  async refreshToken(
+    @Req() req: FastifyRequest,
+    @Res() res: FastifyReply,
+    @Body() refreshAccessDto: RefreshAccessDto,
+    @Origin() origin: string,
+  ) {
+    const token = this.getRefreshFromCookieOrBody(req, refreshAccessDto);
+    const result = await this._authService.refreshToken(token, origin);
+    this.saveRefreshCookie(res, result.refreshToken);
+    return Result.toSingle(result);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('logout')
+  async logout(
+    @Req() req: FastifyRequest,
+    @Res() res: FastifyReply,
+    @Body() refreshAccessDto?: RefreshAccessDto,
+  ) {
+    const token = this.getRefreshFromCookieOrBody(req, refreshAccessDto);
+    await this._authService.logout(token);
+
+    this.clearCookies(res)
+      .header('Content-Type', 'application/json')
+      .status(HttpStatus.OK);
+  }
+
+  @Get('/me')
+  @ApiOkResponse({
+    type: User,
+    description: 'The user is found and returned.',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'The user is not logged in.',
+  })
+  public async getMe(@CurrentUser('id') id: string) {
+    const user = await this._userService.findOneByAccountId(id);
+
+    return Result.toSingle(user);
+  }
+
+  private getRefreshFromCookieOrBody(
+    req: FastifyRequest,
+    body?: RefreshAccessDto,
+  ): string {
+    const token: string | undefined =
+      req.cookies[COOKIE_KEY.REFRESH_TOKEN] ?? body?.refreshToken;
+    if (isNil(token)) {
+      throw Errors.Authentication.InvalidRefreshToken;
+    }
+
+    const { valid, value } = req.unsignCookie(token);
+    if (!valid) {
+      throw Errors.Authentication.InvalidRefreshToken;
+    }
+
+    return value;
   }
 
   private saveRefreshCookie(
@@ -94,18 +162,9 @@ export class AuthController {
     });
   }
 
-  @Get('/me')
-  @ApiOkResponse({
-    type: User,
-    description: 'The user is found and returned.',
-  })
-  @ApiUnauthorizedResponse({
-    description: 'The user is not logged in.',
-  })
-  public async getMe(@CurrentUser('id') id: string) {
-    console.log(id);
-    const user = await this._userService.findOneByAccountId(id);
-
-    return Result.toSingle(user);
+  private clearCookies(res: FastifyReply): FastifyReply {
+    return res.clearCookie(COOKIE_KEY.REFRESH_TOKEN, {
+      path: this._cookiePath,
+    });
   }
 }

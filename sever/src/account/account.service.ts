@@ -1,5 +1,7 @@
 import { Account } from '@app/entities';
+import { Errors } from '@app/errors';
 import { AccountRepository } from '@app/repositories';
+import { isNil } from '@app/utils';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { EntityManager, FilterQuery } from '@mikro-orm/postgresql';
 import { Injectable } from '@nestjs/common';
@@ -14,7 +16,27 @@ export class AccountService {
     protected readonly _em: EntityManager,
   ) {}
 
-  findOneById(id: string) {
+  async findOneByCredentials(id: string, version: number) {
+    const account = await this._repository.findOne(
+      {
+        id,
+        version,
+      },
+      { populate: ['user'] },
+    );
+
+    if (isNil(account)) {
+      throw Errors.Authentication.InvalidCredentials;
+    }
+
+    if (account.version !== version) {
+      throw Errors.Authentication.InvalidCredentials;
+    }
+
+    return account;
+  }
+
+  async findOneById(id: string) {
     return this._repository.findOne(
       {
         id,
@@ -23,7 +45,7 @@ export class AccountService {
     );
   }
 
-  findOneByUsername(username: string) {
+  async findOneByUsername(username: string) {
     return this._repository.findOne(
       {
         username,
@@ -32,7 +54,7 @@ export class AccountService {
     );
   }
 
-  findOneByEmail(email: string) {
+  async findOneByEmail(email: string) {
     return this._repository.findOne(
       {
         email,

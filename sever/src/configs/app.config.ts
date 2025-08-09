@@ -13,7 +13,8 @@ export const appConfig = registerAs('app', () => {
     host,
     port,
     scheme,
-
+    throttlerTtl: Number(process.env.THROTTLER_TTL) || 60,
+    throttlerLimit: Number(process.env.THROTTLER_LIMIT) || 20,
     get domain() {
       return `${scheme}://${host}:${port}`;
     },

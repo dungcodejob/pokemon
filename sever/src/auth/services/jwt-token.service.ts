@@ -85,6 +85,7 @@ export class JwtTokenService {
     tokenType: TokenTypeEnum,
   ): Promise<T> {
     const { time, secret } = this.jwtConfig[tokenType];
+
     const jwtOptions: JwtVerifyOptions = {
       issuer: this.issuer,
       audience: new RegExp(this.appConfig.domain),

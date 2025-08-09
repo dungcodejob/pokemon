@@ -6,7 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { BcryptService, JwtTokenService } from './services';
+import { BacklistService, BcryptService, JwtTokenService } from './services';
 
 @Module({
   imports: [
@@ -16,7 +16,7 @@ import { BcryptService, JwtTokenService } from './services';
     UserModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, BcryptService, JwtTokenService],
-  exports: [AuthService],
+  providers: [AuthService, BcryptService, JwtTokenService, BacklistService],
+  exports: [AuthService, JwtTokenService, BacklistService],
 })
 export class AuthModule {}

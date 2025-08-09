@@ -10,4 +10,9 @@ export class Authentication {
   static InvalidCredentials = new UnauthorizedException(
     'Auth.InvalidCredentials',
   );
+
+  static InvalidToken = new UnauthorizedException('Auth.InvalidToken');
+  static InvalidRefreshToken = new UnauthorizedException(
+    'Auth.InvalidRefreshToken',
+  );
 }

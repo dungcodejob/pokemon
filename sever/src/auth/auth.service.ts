@@ -9,7 +9,8 @@ import { Injectable } from '@nestjs/common';
 import { compare } from 'bcrypt';
 import { isEmail } from 'class-validator';
 import { AuthResultDto, LoginDto, RegisterDto } from './dto';
-import { BcryptService } from './services';
+import { TokenTypeEnum } from './enums/token-type.enum';
+import { BacklistService, BcryptService } from './services';
 import { JwtTokenService } from './services/jwt-token.service';
 @Injectable()
 export class AuthService {
@@ -18,6 +19,7 @@ export class AuthService {
     private readonly _userService: UserService,
     private readonly _bcryptService: BcryptService,
     private readonly _jwtTokenService: JwtTokenService,
+    private readonly _backlistService: BacklistService,
     private readonly _em: EntityManager,
   ) {}
 
@@ -73,6 +75,52 @@ export class AuthService {
     });
 
     await this._em.flush();
+  }
+
+  async refreshToken(
+    refreshToken: string,
+    domain?: string,
+  ): Promise<AuthResultDto> {
+    const { id, version, tokenId } = await this._jwtTokenService.verifyToken(
+      refreshToken,
+      TokenTypeEnum.REFRESH,
+    );
+
+    const isBlacklisted = await this._backlistService.checkIfTokenIsBlacklisted(
+      id,
+      tokenId,
+    );
+
+    if (isBlacklisted) {
+      throw Errors.Authentication.InvalidToken;
+    }
+
+    const account = await this._accountService.findOneByCredentials(
+      id,
+      version,
+    );
+
+    const accessToken = await this._jwtTokenService.generateAccessToken(
+      account,
+      domain,
+    );
+
+    const newRefreshToken = await this._jwtTokenService.generateRefreshToken(
+      account,
+      domain,
+      tokenId,
+    );
+
+    return { user: account.user, accessToken, refreshToken: newRefreshToken };
+  }
+
+  async logout(accessToken: string) {
+    const { id, tokenId, exp } = await this._jwtTokenService.verifyToken(
+      accessToken,
+      TokenTypeEnum.REFRESH,
+    );
+
+    await this._backlistService.addTokenBlacklist(id, tokenId, exp);
   }
 
   private async getAccountByEmailOrUsername(emailOrUsername: string) {

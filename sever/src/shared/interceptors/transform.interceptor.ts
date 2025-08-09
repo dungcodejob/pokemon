@@ -71,7 +71,7 @@ export class TransformInterceptor<T> implements NestInterceptor {
           };
         }
       } else {
-        errorCode = exception.getResponse() as string;
+        errorCode = exception.getResponse()['message'] as string;
       }
 
       if (status === HttpStatus.UNAUTHORIZED) {
@@ -83,7 +83,6 @@ export class TransformInterceptor<T> implements NestInterceptor {
       errorCode = 'App.MikroORM';
       message = exception.message;
     } else if (exception instanceof Error) {
-      console.log(exception);
       message = exception.message;
     }
 
