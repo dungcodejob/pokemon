@@ -1,0 +1,7 @@
+<div nz-row [nzGutter]="[32, 32]">
+  @for (item of $pokemonList(); track item.id) {
+    <div nz-col [nzSpan]="6">
+      <app-pokemon-card [data]="item"></app-pokemon-card>
+    </div>
+  }
+</div>

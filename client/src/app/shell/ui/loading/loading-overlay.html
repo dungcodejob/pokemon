@@ -1,0 +1,12 @@
+@if (isLoading()) {
+  <div class="fixed inset-0 flex items-center justify-center bg-opacity-90">
+    <nz-spin
+      nzSimple
+      [nzSize]="'large'"
+      [nzSpinning]="isLoading()"
+      [nzTip]="tip()"
+    >
+      <div class="loading-content"></div>
+    </nz-spin>
+  </div>
+}

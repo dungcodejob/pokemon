@@ -1,0 +1,143 @@
+<nz-card class="pokemon-card" [nzHoverable]="true">
+  <div nz-card-meta>
+    <!-- Header -->
+    <div class="flex items-center gap-4 mb-4">
+      <div class="flex-shrink-0">
+        <img
+          [src]="data().image"
+          [alt]="data().name"
+          class="w-16 h-16 object-contain"
+        />
+      </div>
+      <div class="flex w-full h-full justify-between items-baseline">
+        <div class="flex-1">
+          <h3 class="text-lg font-semibold capitalize mb-1">
+            {{ data().name }}
+          </h3>
+          <div class="flex gap-1 flex-wrap">
+            @for (type of data().types; track type.name) {
+              <nz-tag [nzColor]="getTypeColor(type.name)" class="text-xs">
+                {{ type.name }}
+              </nz-tag>
+            }
+          </div>
+        </div>
+
+        <div class="flex flex-col justify-between items-center flex-wrap gap-3">
+          <div class="flex items-center gap-2 text-sm">
+            <nz-icon nzType="trophy" nzTheme="outline"></nz-icon>
+            <span>Generation {{ data().generation }}</span>
+          </div>
+          @if (data().legendary) {
+            <nz-badge nzStatus="warning" nzText="Legendary"></nz-badge>
+          }
+        </div>
+      </div>
+    </div>
+
+    <nz-divider nzText="Base Stats" nzOrientation="left"></nz-divider>
+
+    <!-- Stats -->
+    <div class="space-y-3">
+      <!-- HP -->
+      <div>
+        <div class="flex justify-between items-center mb-1">
+          <span class="text-sm font-medium">HP</span>
+          <span class="text-sm font-semibold">{{ data().hp }}</span>
+        </div>
+        <nz-progress
+          [nzPercent]="(data().hp / 255) * 100"
+          nzStrokeColor="#52c41a"
+          [nzShowInfo]="false"
+          nzSize="small"
+        ></nz-progress>
+      </div>
+
+      <!-- Attack -->
+      <div>
+        <div class="flex justify-between items-center mb-1">
+          <span class="text-sm font-medium">Attack</span>
+          <span class="text-sm font-semibold">{{ data().attack }}</span>
+        </div>
+        <nz-progress
+          [nzPercent]="(data().attack / 255) * 100"
+          nzStrokeColor="#f5222d"
+          [nzShowInfo]="false"
+          nzSize="small"
+        ></nz-progress>
+      </div>
+
+      <div>
+        <div class="flex justify-between items-center mb-1">
+          <span class="text-sm font-medium">Defense</span>
+          <span class="text-sm font-semibold">{{ data().defense }}</span>
+        </div>
+        <nz-progress
+          [nzPercent]="(data().defense / 255) * 100"
+          nzStrokeColor="#1890ff"
+          [nzShowInfo]="false"
+          nzSize="small"
+        ></nz-progress>
+      </div>
+
+      <div>
+        <div class="flex justify-between items-center mb-1">
+          <span class="text-sm font-medium">Sp. Atk</span>
+          <span class="text-sm font-semibold">{{ data().spAttack }}</span>
+        </div>
+        <nz-progress
+          [nzPercent]="(data().spAttack / 255) * 100"
+          nzStrokeColor="#722ed1"
+          [nzShowInfo]="false"
+          nzSize="small"
+        ></nz-progress>
+      </div>
+
+      <div>
+        <div class="flex justify-between items-center mb-1">
+          <span class="text-sm font-medium">Sp. Def</span>
+          <span class="text-sm font-semibold">{{ data().spDefense }}</span>
+        </div>
+        <nz-progress
+          [nzPercent]="(data().spDefense / 255) * 100"
+          nzStrokeColor="#13c2c2"
+          [nzShowInfo]="false"
+          nzSize="small"
+        ></nz-progress>
+      </div>
+
+      <div>
+        <div class="flex justify-between items-center mb-1">
+          <span class="text-sm font-medium">Speed</span>
+          <span class="text-sm font-semibold">{{ data().speed }}</span>
+        </div>
+        <nz-progress
+          [nzPercent]="(data().speed / 255) * 100"
+          nzStrokeColor="#faad14"
+          [nzShowInfo]="false"
+          nzSize="small"
+        ></nz-progress>
+      </div>
+
+      <div class="pt-2 border-t border-gray-200">
+        <div class="flex justify-between items-center">
+          <span class="text-sm font-medium">Total</span>
+          <span class="text-base font-bold text-blue-600">{{
+            data().total
+          }}</span>
+        </div>
+      </div>
+    </div>
+
+    <nz-divider></nz-divider>
+
+    @if (data().ytbUrl) {
+      <div class="text-center">
+        <button nz-button nzType="primary" nzGhost (click)="onOpenYouTube()">
+          <nz-icon nzType="youtube" nzTheme="outline"></nz-icon>
+          Watch Video
+        </button>
+      </div>
+    }
+  </div>
+</nz-card>

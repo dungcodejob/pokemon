@@ -13,7 +13,9 @@
       "@shared": ["src/app/shared"],
       "@shared/*": ["src/app/shared/*"],
       "@core": ["src/app/core"],
-      "@core/*": ["src/app/core/*"]
+      "@core/*": ["src/app/core/*"],
+      "@pokemon": ["src/app/pokemon"],
+      "@pokemon/*": ["src/app/pokemon/*"]
     },
 
     "noImplicitOverride": true,

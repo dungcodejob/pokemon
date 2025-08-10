@@ -1,9 +1,14 @@
 import {
   DashboardOutline,
   FormOutline,
+  LayoutOutline,
   LockOutline,
   MenuFoldOutline,
   MenuUnfoldOutline,
+  MoonOutline,
+  SmileOutline,
+  StarOutline,
+  SunOutline,
 } from '@ant-design/icons-angular/icons';
 
 export const icons = [
@@ -12,4 +17,9 @@ export const icons = [
   DashboardOutline,
   FormOutline,
   LockOutline,
+  LayoutOutline,
+  SmileOutline,
+  StarOutline,
+  MoonOutline,
+  SunOutline,
 ];

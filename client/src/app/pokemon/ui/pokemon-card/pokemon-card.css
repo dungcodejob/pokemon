@@ -1,0 +1,7 @@
+.pokemon-card {
+  margin: 0 auto;
+}
+
+.space-y-3 > * + * {
+  margin-top: 0.75rem;
+}

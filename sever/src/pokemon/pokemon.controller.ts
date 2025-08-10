@@ -91,7 +91,7 @@ export class PokemonController {
   @ApiOperation({ summary: 'Get all types' })
   async findTypes() {
     const result = await this._pokemonService.findTypes();
-    return Result.toSingle(result);
+    return Result.toList(result);
   }
 
   @Post('/:id/favorite')

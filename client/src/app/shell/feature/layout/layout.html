@@ -13,31 +13,18 @@
         <h1>Ant Design of Angular</h1>
       </a>
     </div>
-    <ul
-      nz-menu
-      nzTheme="dark"
-      nzMode="inline"
-      [nzInlineCollapsed]="isCollapsed"
-    >
-      <li nz-submenu nzOpen nzTitle="Dashboard" nzIcon="dashboard">
-        <ul>
-          <li nz-menu-item nzMatchRouter>
-            <a routerLink="/welcome">Welcome</a>
-          </li>
-          <li nz-menu-item nzMatchRouter>
-            <a>Monitor</a>
-          </li>
-          <li nz-menu-item nzMatchRouter>
-            <a>Workplace</a>
-          </li>
-        </ul>
+    <ul nz-menu nzMode="inline">
+      <li nz-menu-item [routerLink]="dashboardLink">
+        <nz-icon nzType="layout" />
+        <span>Dashboard</span>
       </li>
-      <li nz-submenu nzOpen nzTitle="Form" nzIcon="form">
-        <ul>
-          <li nz-menu-item nzMatchRouter>
-            <a>Basic Form</a>
-          </li>
-        </ul>
+      <li nz-menu-item [routerLink]="pokemonLink">
+        <nz-icon nzType="smile" />
+        <span>Pokemon</span>
+      </li>
+      <li nz-menu-item [routerLink]="favoritesLink">
+        <nz-icon nzType="star" />
+        <span>Favorites</span>
       </li>
     </ul>
   </nz-sider>
@@ -48,6 +35,13 @@
           <nz-icon
             class="trigger"
             [nzType]="isCollapsed ? 'menu-unfold' : 'menu-fold'"
+          />
+        </span>
+        <span (click)="onToggleTheme()">
+          <nz-icon
+            class="trigger text-xl"
+            [nzType]="$isDarkTheme() ? 'sun' : 'moon'"
+            nzTheme="outline"
           />
         </span>
       </div>

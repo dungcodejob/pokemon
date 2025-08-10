@@ -77,10 +77,7 @@ export class AuthService {
     await this._em.flush();
   }
 
-  async refreshToken(
-    refreshToken: string,
-    domain?: string,
-  ): Promise<AuthResultDto> {
+  async refreshToken(refreshToken: string): Promise<AuthResultDto> {
     const { id, version, tokenId } = await this._jwtTokenService.verifyToken(
       refreshToken,
       TokenTypeEnum.REFRESH,
@@ -100,16 +97,11 @@ export class AuthService {
       version,
     );
 
-    const accessToken = await this._jwtTokenService.generateAccessToken(
-      account,
-      domain,
-    );
+    const accessToken =
+      await this._jwtTokenService.generateAccessToken(account);
 
-    const newRefreshToken = await this._jwtTokenService.generateRefreshToken(
-      account,
-      domain,
-      tokenId,
-    );
+    const newRefreshToken =
+      await this._jwtTokenService.generateRefreshToken(account);
 
     return { user: account.user, accessToken, refreshToken: newRefreshToken };
   }

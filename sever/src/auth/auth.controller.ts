@@ -5,12 +5,7 @@ import {
   type JwtConfig,
 } from '@app/configs';
 import { COOKIE_KEY } from '@app/constants';
-import {
-  CurrentAccount,
-  Origin,
-  Public,
-  ResponseMessage,
-} from '@app/decorators';
+import { CurrentAccount, Public, ResponseMessage } from '@app/decorators';
 import { User } from '@app/entities';
 import { Errors } from '@app/errors';
 import { ErrorResponseDto, Result, SuccessResponseDto } from '@app/models';
@@ -99,11 +94,10 @@ export class AuthController {
     @Req() req: FastifyRequest,
     @Res() res: FastifyReply,
     @Body() refreshAccessDto: RefreshAccessDto,
-    @Origin() origin: string,
   ) {
     const token = this.getRefreshFromCookieOrBody(req, refreshAccessDto);
 
-    const result = await this._authService.refreshToken(token, origin);
+    const result = await this._authService.refreshToken(token);
     this.saveRefreshCookie(res, result.refreshToken);
     return Result.toSingle(result);
   }

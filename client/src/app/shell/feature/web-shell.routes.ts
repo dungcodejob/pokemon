@@ -12,6 +12,13 @@ export const webShellRoutes: Routes = [
     path: 'home',
     canActivate: [authGuard],
     component: PKLayout,
+    children: [
+      {
+        path: 'pokemon',
+        loadChildren: () =>
+          import('@pokemon/feature').then((mod) => mod.PokemonShellRoutes),
+      },
+    ],
   },
   {
     path: 'auth',
