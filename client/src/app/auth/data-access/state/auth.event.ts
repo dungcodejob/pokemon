@@ -1,7 +1,7 @@
 import { eventGroup } from '@ngrx/signals/events';
 
 import { type } from '@ngrx/signals';
-import { LoginCredentialsDto } from '../models';
+import { LoginCredentialsDto, RegisterDto } from '../models';
 import { AuthResultDto } from '../models/auth-result.dto';
 
 export const authEvents = eventGroup({
@@ -10,6 +10,7 @@ export const authEvents = eventGroup({
     login: type<{ credentials: LoginCredentialsDto }>(),
     logout: type<void>(),
     refreshToken: type<{ refreshToken: string }>(),
+    register: type<{ credentials: RegisterDto }>(),
     initializer: type<void>(),
   },
 });
@@ -21,5 +22,7 @@ export const authApiEvents = eventGroup({
     loginFailure: type<{ error: unknown }>(),
     refreshTokenSuccess: type<{ data: AuthResultDto }>(),
     refreshTokenFailure: type<{ error: unknown }>(),
+    registerSuccess: type<void>(),
+    registerFailure: type<{ error: unknown }>(),
   },
 });

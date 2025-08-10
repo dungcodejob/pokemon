@@ -9,16 +9,16 @@ import {
 } from '@ngrx/signals';
 import { injectDispatch } from '@ngrx/signals/events';
 
-export const PKLoginFacade = signalStore(
+export const PKRegisterFacade = signalStore(
   withProps(() => ({
     _authStore: inject(AuthStore),
     _dispatch: injectDispatch(authEvents),
   })),
   withComputed(({ _authStore }) => ({
-    $isPending: computed(() => _authStore.$isLoginPending()),
-    $errorMessage: computed(() => errorToString(_authStore.$loginError())),
+    $isPending: computed(() => _authStore.$isRegisterPending()),
+    $errorMessage: computed(() => errorToString(_authStore.$registerError())),
   })),
   withMethods(({ _authStore, _dispatch }) => ({
-    login: _dispatch.login,
+    register: _dispatch.register,
   })),
 );

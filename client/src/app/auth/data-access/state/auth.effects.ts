@@ -1,9 +1,10 @@
 import { effect, inject, Injector } from '@angular/core';
 import { mapToErrorAction, mapToResponseDataAction } from '@core/http';
-import { patchState, signalStoreFeature, type } from '@ngrx/signals';
+import { signalStoreFeature, type } from '@ngrx/signals';
 import { Events, withEffects } from '@ngrx/signals/events';
 import { RedirectService, StorageService } from '@shared/services';
-import { exhaustMap, map, of, tap } from 'rxjs';
+import { NzMessageService } from 'ng-zorro-antd/message';
+import { EMPTY, exhaustMap, map, tap } from 'rxjs';
 import { AuthResultDto } from '../models';
 import { AuthApi } from './auth.api';
 import { authApiEvents, authEvents } from './auth.event';
@@ -21,6 +22,7 @@ export function withAuthEffects() {
         injector = inject(Injector),
         authApi = inject(AuthApi),
         redirectService = inject(RedirectService),
+        messageService = inject(NzMessageService),
       ) => {
         const storageTokens = storageService.use<AuthResultDto>('auth');
 
@@ -28,9 +30,12 @@ export function withAuthEffects() {
           login: events.on(authEvents.login).pipe(
             exhaustMap(({ payload }) => {
               return authApi.login(payload.credentials).pipe(
-                mapToResponseDataAction((result) =>
-                  authApiEvents.loginSuccess({ data: result.data }),
-                ),
+                mapToResponseDataAction((result) => {
+                  messageService.success('Login successful', {
+                    nzDuration: 3000,
+                  });
+                  return authApiEvents.loginSuccess({ data: result.data });
+                }),
                 mapToErrorAction((error) =>
                   authApiEvents.loginFailure({
                     error,
@@ -47,11 +52,27 @@ export function withAuthEffects() {
                   authApiEvents.refreshTokenSuccess({ data: result.data }),
                 ),
                 mapToErrorAction((error) =>
-                  of(
-                    authApiEvents.refreshTokenFailure({
-                      error,
-                    }),
-                  ),
+                  authApiEvents.refreshTokenFailure({
+                    error,
+                  }),
+                ),
+              );
+            }),
+          ),
+
+          register: events.on(authEvents.register).pipe(
+            exhaustMap(({ payload }) => {
+              return authApi.register(payload.credentials).pipe(
+                mapToResponseDataAction(() => {
+                  messageService.success('Register successful', {
+                    nzDuration: 3000,
+                  });
+                  return authApiEvents.registerSuccess();
+                }),
+                mapToErrorAction((error) =>
+                  authApiEvents.registerFailure({
+                    error,
+                  }),
                 ),
               );
             }),
@@ -60,9 +81,6 @@ export function withAuthEffects() {
           initializer: events.on(authEvents.initializer).pipe(
             map(() => {
               const localTokens = storageTokens.get();
-              if (localTokens) {
-                patchState(store, { data: localTokens });
-              }
 
               effect(
                 () => {
@@ -82,13 +100,25 @@ export function withAuthEffects() {
             }),
           ),
 
-          redirect: events
+          redirectToSavedUrl: events
             .on(authApiEvents.loginSuccess, authApiEvents.refreshTokenSuccess)
             .pipe(
               tap(() => {
                 redirectService.redirectToSavedUrl();
               }),
+              map(() => EMPTY),
             ),
+
+          redirectToLogin: events
+            .on(authEvents.logout, authApiEvents.registerSuccess)
+            .pipe(
+              tap(() => redirectService.redirectToLogin()),
+              map(() => EMPTY),
+            ),
+
+          logout: events
+            .on(authApiEvents.refreshTokenFailure)
+            .pipe(map(() => authEvents.logout())),
         };
       },
     ),

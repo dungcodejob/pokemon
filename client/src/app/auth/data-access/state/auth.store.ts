@@ -12,11 +12,13 @@ export type AuthState = {
 export const authApiStatusNames = {
   login: 'login',
   refresh: 'refresh',
+  register: 'register',
 } as const;
 
 export type AuthStateWithStatus = AuthState &
   NamedStatusState<typeof authApiStatusNames.login> &
-  NamedStatusState<typeof authApiStatusNames.refresh>;
+  NamedStatusState<typeof authApiStatusNames.refresh> &
+  NamedStatusState<typeof authApiStatusNames.register>;
 
 export const authInitialState: AuthState = {
   data: null,
@@ -25,7 +27,13 @@ export const authInitialState: AuthState = {
 
 export const AuthStore = signalStore(
   withState(authInitialState),
-  withStatus({ names: [authApiStatusNames.login, authApiStatusNames.refresh] }),
+  withStatus({
+    names: [
+      authApiStatusNames.login,
+      authApiStatusNames.refresh,
+      authApiStatusNames.register,
+    ],
+  }),
   withAuthReducer(),
   withAuthEffects(),
 );

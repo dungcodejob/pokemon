@@ -32,6 +32,10 @@ export class RedirectService {
     });
   }
 
+  redirectToLogin(): void {
+    this._router.navigateByUrl(this.createLoginUrlTree());
+  }
+
   redirectToSavedUrl(defaultUrl = '/'): void {
     const savedUrl = this.getRedirectUrlFromQueryParam() ?? defaultUrl;
     if (this.isAllowAddRedirectParam(savedUrl)) {

@@ -19,7 +19,7 @@
           nz-form
           autocomplete="off"
           class="flex flex-col space-y-6"
-          [formGroup]="loginForm"
+          [formGroup]="registerForm"
           (ngSubmit)="onSubmit()"
         >
           <div class="space-y-4">
@@ -30,11 +30,11 @@
             }
 
             <div class="space-y-2">
-              @let usernameOrEmail = loginForm.get("usernameOrEmail");
-              @if (usernameOrEmail) {
+              @let email = registerForm.get("email");
+              @if (email) {
                 <nz-form-item>
-                  <nz-form-label [nzSpan]="24" nzFor="usernameOrEmail"
-                    >Username or Email</nz-form-label
+                  <nz-form-label [nzSpan]="24" nzFor="email"
+                    >Email</nz-form-label
                   >
                   <nz-form-control [nzSpan]="24" [nzErrorTip]="errorTpl">
                     <input
@@ -44,8 +44,8 @@
                       autocomplete="off"
                       autocorrect="off"
                       class="w-full"
-                      formControlName="usernameOrEmail"
-                      id="usernameOrEmail"
+                      formControlName="email"
+                      id="email"
                       placeholder="name@example.com"
                       type="text"
                     />
@@ -53,7 +53,10 @@
 
                   <ng-template #errorTpl let-control>
                     @if (control.errors?.["required"]) {
-                      Please input your username or email!
+                      Please input your email!
+                    }
+                    @if (control.errors?.["email"]) {
+                      Please input a valid email!
                     }
                   </ng-template>
                 </nz-form-item>
@@ -61,7 +64,32 @@
             </div>
 
             <div class="space-y-2">
-              @let password = loginForm.get("password");
+              @let name = registerForm.get("name");
+              @if (name) {
+                <nz-form-item>
+                  <nz-form-label [nzSpan]="24" nzFor="name">Name</nz-form-label>
+                  <nz-form-control [nzSpan]="24" [nzErrorTip]="errorTpl">
+                    <input
+                      type="text"
+                      nz-input
+                      class="w-full"
+                      formControlName="name"
+                      id="name"
+                      placeholder="Your name"
+                    />
+                  </nz-form-control>
+
+                  <ng-template #errorTpl let-control>
+                    @if (control.errors?.["required"]) {
+                      Please input your name!
+                    }
+                  </ng-template>
+                </nz-form-item>
+              }
+            </div>
+
+            <div class="space-y-2">
+              @let password = registerForm.get("password");
               @if (password) {
                 <nz-form-item>
                   <nz-form-label [nzSpan]="24" nzFor="password"
@@ -104,18 +132,18 @@
             @if ($isPending()) {
               <span>Loading...</span>
             } @else {
-              <span>Login</span>
+              <span>Register</span>
             }
           </button>
         </form>
       </div>
 
       <div class="flex items-center justify-center gap-3 pt-4">
-        <p class="text-sm text-gray-500 !mb-0">Don't have an account?</p>
+        <p class="text-sm text-gray-500 !mb-0">Already have an account?</p>
         <a
           class="text-sm text-blue-600 hover:text-blue-800 font-semibold cursor-pointer"
-          [routerLink]="registerLink"
-          >Register</a
+          [routerLink]="loginLink"
+          >Login</a
         >
       </div>
     </div>

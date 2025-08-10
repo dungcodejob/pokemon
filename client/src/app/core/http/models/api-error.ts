@@ -4,7 +4,7 @@ import { ErrorResponseDto } from './response.dto';
 export class PKApiError extends Error {
   private constructor(
     override readonly message: string,
-    readonly data: unknown = null,
+    readonly data: ErrorResponseDto | null = null,
     readonly route?: string,
   ) {
     super(message);
@@ -24,7 +24,7 @@ export class PKApiError extends Error {
     );
   }
 
-  is(error: unknown): error is PKApiError {
+  static is(error: unknown): error is PKApiError {
     if (error instanceof PKApiError && error.name === 'MCApiError') {
       return true;
     }

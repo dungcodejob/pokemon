@@ -5,4 +5,6 @@ export const API_ENDPOINTS = {
     LOGOUT: '/auth/logout',
     REFRESH: '/auth/refresh',
   },
+  CONFIGURATION: '/configuration',
+  ASSETS: '/assets',
 } as const;

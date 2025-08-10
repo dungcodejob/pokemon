@@ -9,12 +9,13 @@ import {
 import { provideRouter, withRouterConfig } from '@angular/router';
 
 import { registerLocaleData } from '@angular/common';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import en from '@angular/common/locales/en';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { authEvents, AuthStore } from '@auth/data-access';
+import { authInterceptor } from '@auth/utils';
 import { provideAppInitWithConfigAsync, providerAppConfig } from '@core/config';
 import { injectDispatch } from '@ngrx/signals/events';
 import { ThemeService } from '@shared/services';
@@ -40,7 +41,7 @@ export const appConfig: ApplicationConfig = {
     provideNzI18n(en_US),
     importProvidersFrom(FormsModule),
     provideAnimationsAsync(),
-    provideHttpClient(),
+    provideHttpClient(withInterceptors([authInterceptor])),
     providerAppConfig(environment),
     provideAppInitWithConfigAsync(() => {
       const themeService = inject(ThemeService);

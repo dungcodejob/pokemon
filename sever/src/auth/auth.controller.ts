@@ -141,18 +141,21 @@ export class AuthController {
     req: FastifyRequest,
     body?: RefreshAccessDto,
   ): string {
-    const token: string | undefined =
-      req.cookies[COOKIE_KEY.REFRESH_TOKEN] ?? body?.refreshToken;
-    if (isNil(token)) {
-      throw Errors.Authentication.InvalidRefreshToken;
+    const reqToken = req.cookies[COOKIE_KEY.REFRESH_TOKEN];
+    if (!isNil(reqToken)) {
+      const { valid, value } = req.unsignCookie(reqToken);
+      if (!valid) {
+        throw Errors.Authentication.InvalidRefreshToken;
+      }
+
+      return value;
     }
 
-    const { valid, value } = req.unsignCookie(token);
-    if (!valid) {
-      throw Errors.Authentication.InvalidRefreshToken;
+    if (!isNil(body?.refreshToken)) {
+      return body?.refreshToken;
     }
 
-    return value;
+    throw Errors.Authentication.InvalidRefreshToken;
   }
 
   private saveRefreshCookie(

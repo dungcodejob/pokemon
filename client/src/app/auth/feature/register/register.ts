@@ -20,15 +20,16 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
-import { PKLoginFacade } from './login.facade';
+import { PKRegisterFacade } from './register.facade';
 
-type LoginForm = FormGroup<{
-  usernameOrEmail: FormControl<string>;
+type RegisterForm = FormGroup<{
+  email: FormControl<string>;
+  name: FormControl<string>;
   password: FormControl<string>;
 }>;
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-register',
   imports: [
     NzIconModule,
     NzLayoutModule,
@@ -39,25 +40,26 @@ type LoginForm = FormGroup<{
     NzButtonModule,
     RouterLink,
   ],
-  providers: [PKLoginFacade],
-  templateUrl: './login.html',
-  styleUrl: './login.css',
+  providers: [PKRegisterFacade],
+  templateUrl: './register.html',
+  styleUrl: './register.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PKLogin implements OnInit {
+export class PKRegister implements OnInit {
   private readonly _autoEffect = injectAutoEffect();
   private readonly _nonNullFB = inject(NonNullableFormBuilder);
-  private readonly _loginFacade = inject(PKLoginFacade);
+  private readonly _registerFacade = inject(PKRegisterFacade);
 
-  $errorMessage = this._loginFacade.$errorMessage;
-  $isPending = this._loginFacade.$isPending;
-  registerLink = ROUTES.REGISTER;
-
-  loginForm!: LoginForm;
+  $errorMessage = this._registerFacade.$errorMessage;
+  $isPending = this._registerFacade.$isPending;
+  loginLink = ROUTES.LOGIN;
+  registerForm!: RegisterForm;
 
   protected get isSubmitDisabled(): boolean {
     return (
-      !this.loginForm.valid || this.loginForm.pristine || this.$isPending()
+      !this.registerForm.valid ||
+      this.registerForm.pristine ||
+      this.$isPending()
     );
   }
 
@@ -67,22 +69,26 @@ export class PKLogin implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.loginForm.valid) {
-      const body = this.loginForm.getRawValue();
-      this._loginFacade.login({
+    if (this.registerForm.valid) {
+      const body = this.registerForm.getRawValue();
+      this._registerFacade.register({
         credentials: {
-          emailOrUsername: body.usernameOrEmail,
+          email: body.email,
+          name: body.name,
           password: body.password,
         },
       });
     } else {
-      this.loginForm.updateValueAndValidity();
+      this.registerForm.updateValueAndValidity();
     }
   }
 
   private initForm(): void {
-    this.loginForm = this._nonNullFB.group<LoginForm['controls']>({
-      usernameOrEmail: this._nonNullFB.control('', {
+    this.registerForm = this._nonNullFB.group<RegisterForm['controls']>({
+      email: this._nonNullFB.control('', {
+        validators: [Validators.required, Validators.email],
+      }),
+      name: this._nonNullFB.control('', {
         validators: Validators.required,
       }),
       password: this._nonNullFB.control('', {
@@ -93,8 +99,8 @@ export class PKLogin implements OnInit {
 
   private registerLoadingEffect(): void {
     this._autoEffect(() => {
-      const loading = this._loginFacade.$isPending();
-      loading ? this.loginForm.disable() : this.loginForm.enable();
+      const loading = this._registerFacade.$isPending();
+      loading ? this.registerForm.disable() : this.registerForm.enable();
     });
   }
 }

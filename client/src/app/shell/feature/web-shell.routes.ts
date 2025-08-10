@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from '@auth/utils';
 import { PKLayout } from './layout/layout';
 
 export const webShellRoutes: Routes = [
@@ -9,6 +10,7 @@ export const webShellRoutes: Routes = [
   },
   {
     path: 'home',
+    canActivate: [authGuard],
     component: PKLayout,
   },
   {

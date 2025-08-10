@@ -41,6 +41,15 @@ export function withAuthReducer() {
         isInitialized: true,
         ...setError(payload.error, authApiStatusNames.login),
       })),
+      on(authEvents.register, () => ({
+        ...setPending(authApiStatusNames.register),
+      })),
+      on(authApiEvents.registerSuccess, () => ({
+        ...setFulfilled(authApiStatusNames.register),
+      })),
+      on(authApiEvents.registerFailure, ({ payload }) => ({
+        ...setError(payload.error, authApiStatusNames.register),
+      })),
     ),
   );
 }
