@@ -8,6 +8,8 @@
     "paths": {
       "@shell": ["src/app/shell"],
       "@shell/*": ["src/app/shell/*"],
+      "@auth": ["src/app/auth"],
+      "@auth/*": ["src/app/auth/*"],
       "@shared": ["src/app/shared"],
       "@shared/*": ["src/app/shared/*"],
       "@core": ["src/app/core"],
