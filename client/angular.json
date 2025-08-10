@@ -26,7 +26,19 @@
                 "output": "/assets/"
               }
             ],
-            "styles": ["src/theme.less", "src/styles.css"]
+            "styles": [
+              "src/styles.css",
+              {
+                "input": "src/styles/light.less",
+                "bundleName": "light",
+                "inject": false
+              },
+              {
+                "input": "src/styles/dark.less",
+                "bundleName": "dark",
+                "inject": false
+              }
+            ]
           },
           "configurations": {
             "production": {
