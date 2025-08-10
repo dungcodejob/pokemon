@@ -21,9 +21,26 @@ export function withPokemonReducer() {
       on(pokemonApiEvents.findSuccess, ({ payload }) => [
         setFulfilled(pokemonApiStatusNames.find),
         setAllEntities(payload.data),
+        {
+          totalPages: payload.pagination.totalPages,
+          totalCount: payload.pagination.totalCount,
+          ...payload.filter,
+        },
       ]),
       on(pokemonApiEvents.findFailure, ({ payload }) => ({
         ...setError(payload.error, pokemonApiStatusNames.find),
+      })),
+      on(pokemonEvents.setFilter, ({ payload }) => ({
+        ...payload.filter,
+      })),
+      on(pokemonEvents.setPagination, ({ payload }) => ({
+        ...payload.pagination,
+      })),
+      on(pokemonEvents.setName, ({ payload }) => ({
+        ...payload,
+      })),
+      on(pokemonEvents.setLegendary, ({ payload }) => ({
+        ...payload,
       })),
     ),
   );

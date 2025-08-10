@@ -1,19 +1,40 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   inject,
   OnInit,
 } from '@angular/core';
-import { injectDispatch } from '@ngrx/signals/events';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { PokemonFilterDto } from '@pokemon/data-access';
 import { PKPokemonCard } from '@pokemon/ui';
 import { ROUTES } from '@shared/constants';
-import { appEvents } from '@shared/data-access';
 import { injectAutoEffect } from '@shared/utils';
+import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzGridModule } from 'ng-zorro-antd/grid';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzPaginationModule } from 'ng-zorro-antd/pagination';
+import { NzSpinModule } from 'ng-zorro-antd/spin';
+import { NzSwitchModule } from 'ng-zorro-antd/switch';
+import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { PKPokemonManagementFacade } from './pokemon-management.facade';
+
 @Component({
   selector: 'app-pokemon-management',
-  imports: [PKPokemonCard, NzGridModule],
+  imports: [
+    PKPokemonCard,
+    NzGridModule,
+    NzPaginationModule,
+    NzInputModule,
+    NzButtonModule,
+    NzIconModule,
+    FormsModule,
+    NzSpinModule,
+    NzSwitchModule,
+  ],
   providers: [PKPokemonManagementFacade],
   templateUrl: './pokemon-management.html',
   styleUrl: './pokemon-management.css',
@@ -22,18 +43,100 @@ import { PKPokemonManagementFacade } from './pokemon-management.facade';
 export class PKPokemonManagement implements OnInit {
   private readonly _autoEffect = injectAutoEffect();
   private readonly _pokemonManagementFacade = inject(PKPokemonManagementFacade);
-  private readonly _appDispatch = injectDispatch(appEvents);
+  private readonly _router = inject(Router);
+  private readonly _searchKeySubject = new Subject<string>();
+  private readonly _destroyRef = inject(DestroyRef);
 
   $errorMessage = this._pokemonManagementFacade.$errorMessage;
   $isPending = this._pokemonManagementFacade.$isPending;
   $pokemonList = this._pokemonManagementFacade.$pokemonList;
+  $totalPages = this._pokemonManagementFacade.$totalPages;
+  $totalCount = this._pokemonManagementFacade.$totalCount;
+  $pageSize = this._pokemonManagementFacade.$pageSize;
+  $currentPage = this._pokemonManagementFacade.$currentPage;
+  $searchValue = this._pokemonManagementFacade.$name;
+  $legendary = this._pokemonManagementFacade.$legendary;
+  $typeIds = this._pokemonManagementFacade.$typeIds;
+  $sortBy = this._pokemonManagementFacade.$sortBy;
+  $sortOrder = this._pokemonManagementFacade.$sortOrder;
+
   registerLink = ROUTES.REGISTER;
 
   ngOnInit(): void {
-    this._pokemonManagementFacade.find({ filter: {} });
+    this.registerFilterChangeEffect();
+    this.syncFilterToUrl();
+    this.listenSearchKeyChange();
+  }
+
+  constructor() {}
+
+  onLegendaryChange(value: boolean) {
+    this._pokemonManagementFacade.setLegendary({ legendary: value });
+  }
+
+  onSearchChange(value: string) {
+    this._searchKeySubject.next(value);
+  }
+
+  onCurrentPageChange(page: number) {
+    this._pokemonManagementFacade.setPagination({
+      pagination: {
+        currentPage: page,
+        pageSize: this.$pageSize(),
+      },
+    });
+  }
+
+  onPageSizeChange(pageSize: number) {
+    this._pokemonManagementFacade.setPagination({
+      pagination: {
+        currentPage: 1,
+        pageSize,
+      },
+    });
+  }
+
+  private listenSearchKeyChange() {
+    this._searchKeySubject
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        takeUntilDestroyed(this._destroyRef),
+      )
+      .subscribe((value) => {
+        this._pokemonManagementFacade.setName({ name: value });
+      });
+  }
+
+  private registerFilterChangeEffect() {
     this._autoEffect(() => {
-      const isPending = this._pokemonManagementFacade.$isPending();
-      this._appDispatch.setLoading({ loading: isPending });
+      const filter: PokemonFilterDto = {
+        name: this.$searchValue(),
+        legendary: this.$legendary(),
+        typeIds: this.$typeIds() ?? undefined,
+        pagination: {
+          currentPage: this.$currentPage(),
+          pageSize: this.$pageSize(),
+        },
+      };
+      this._pokemonManagementFacade.find({ filter });
+    });
+  }
+
+  private syncFilterToUrl() {
+    this._autoEffect(() => {
+      this._router.navigate([], {
+        queryParams: {
+          currentPage: this.$currentPage(),
+          pageSize: this.$pageSize(),
+          name: this.$searchValue(),
+          legendary: this.$legendary(),
+          typeIds: this.$typeIds(),
+          sortBy: this.$sortBy(),
+          sortOrder: this.$sortOrder(),
+        },
+        queryParamsHandling: 'merge',
+      });
     });
   }
 }

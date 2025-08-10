@@ -1,4 +1,3 @@
-import { PaginationMetaDto } from '@core/http';
 import { signalStore, withState } from '@ngrx/signals';
 import { EntityState, withEntities } from '@ngrx/signals/entities';
 import {
@@ -6,13 +5,27 @@ import {
   DEFAULT_PAGE_SIZE,
 } from '@shared/constants/default-values.constants';
 import { NamedStatusState, withStatus } from '@shared/utils';
-import { PokemonResultDto, PokemonTypeResultDto } from '../../models';
+import {
+  PokemonResultDto,
+  PokemonSortField,
+  PokemonTypeResultDto,
+  SortOrder,
+} from '../../models';
 import { withPokemonEffects } from './pokemon.effects';
 import { withPokemonReducer } from './pokemon.reducer';
 
 export type PokemonState = {
   types: PokemonTypeResultDto[];
-} & PaginationMetaDto;
+  totalPages: number;
+  totalCount: number;
+  currentPage: number;
+  pageSize: number;
+  sortBy: PokemonSortField | null;
+  sortOrder: SortOrder | null;
+  name: string;
+  legendary: boolean;
+  typeIds: string[] | null;
+};
 
 export const pokemonApiStatusNames = {
   find: 'find',
@@ -39,12 +52,15 @@ export const pokemonInitialState: PokemonStateWithFeature = {
   toggleFavoriteStatus: { error: null },
   entityMap: {},
   ids: [],
+  name: '',
+  legendary: false,
   totalPages: 0,
   totalCount: 0,
-  hasPrevious: false,
-  hasNext: false,
   currentPage: DEFAULT_PAGE_NUMBER,
   pageSize: DEFAULT_PAGE_SIZE,
+  typeIds: null,
+  sortBy: null,
+  sortOrder: null,
 };
 
 export const PKPokemonStore = signalStore(

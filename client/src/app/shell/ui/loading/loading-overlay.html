@@ -1,5 +1,7 @@
 @if (isLoading()) {
-  <div class="fixed inset-0 flex items-center justify-center bg-opacity-90">
+  <div
+    class="fixed inset-0 z-[9999] flex items-center justify-center bg-opacity-90 bg-black transition-all duration-300"
+  >
     <nz-spin
       nzSimple
       [nzSize]="'large'"

@@ -1,5 +1,6 @@
 import { eventGroup } from '@ngrx/signals/events';
 
+import { PaginationDto, PaginationMetaDto } from '@core/http';
 import { type } from '@ngrx/signals';
 import { PokemonResultDto, PokemonTypeResultDto } from '../../models';
 import { PokemonDetailsDto } from '../../models/pokemon-details.dto';
@@ -17,13 +18,27 @@ export const pokemonEvents = eventGroup({
     findFavorites: type<void>(),
 
     toggleFavorite: type<{ id: string }>(),
+
+    reset: type<void>(),
+
+    setFilter: type<{ filter: PokemonFilterDto }>(),
+
+    setPagination: type<{ pagination: PaginationDto }>(),
+    nextPage: type<void>(),
+    prevPage: type<void>(),
+    setName: type<{ name: string }>(),
+    setLegendary: type<{ legendary: boolean }>(),
   },
 });
 
 export const pokemonApiEvents = eventGroup({
   source: 'Pokemon API',
   events: {
-    findSuccess: type<{ data: PokemonResultDto[] }>(),
+    findSuccess: type<{
+      data: PokemonResultDto[];
+      pagination: PaginationMetaDto;
+      filter: PokemonFilterDto;
+    }>(),
     findFailure: type<{ error: unknown }>(),
 
     findOneSuccess: type<{ data: PokemonDetailsDto }>(),

@@ -14,6 +14,11 @@ export const webShellRoutes: Routes = [
     component: PKLayout,
     children: [
       {
+        path: 'dashboard',
+        loadChildren: () =>
+          import('@dashboard/feature').then((mod) => mod.DashboardShellRoutes),
+      },
+      {
         path: 'pokemon',
         loadChildren: () =>
           import('@pokemon/feature').then((mod) => mod.PokemonShellRoutes),

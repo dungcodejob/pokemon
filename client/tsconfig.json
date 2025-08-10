@@ -15,7 +15,9 @@
       "@core": ["src/app/core"],
       "@core/*": ["src/app/core/*"],
       "@pokemon": ["src/app/pokemon"],
-      "@pokemon/*": ["src/app/pokemon/*"]
+      "@pokemon/*": ["src/app/pokemon/*"],
+      "@dashboard": ["src/app/dashboard"],
+      "@dashboard/*": ["src/app/dashboard/*"]
     },
 
     "noImplicitOverride": true,

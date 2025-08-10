@@ -23,11 +23,11 @@ export enum PokemonSortField {
   Speed = 'speed',
 }
 
-export class PokemonFilterDto {
+export type PokemonFilterDto = {
   name?: string;
   legendary?: boolean;
   typeIds?: string[];
   ranges?: RangeFilterDto<PokemonRangeFilterField>[];
   sort?: SortDto<PokemonSortField>;
   pagination?: PaginationDto;
-}
+};

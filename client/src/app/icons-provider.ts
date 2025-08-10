@@ -9,6 +9,8 @@ import {
   SmileOutline,
   StarOutline,
   SunOutline,
+  TrophyOutline,
+  YoutubeOutline,
 } from '@ant-design/icons-angular/icons';
 
 export const icons = [
@@ -22,4 +24,6 @@ export const icons = [
   StarOutline,
   MoonOutline,
   SunOutline,
+  YoutubeOutline,
+  TrophyOutline,
 ];
