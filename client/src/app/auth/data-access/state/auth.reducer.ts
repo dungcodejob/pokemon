@@ -12,19 +12,19 @@ export function withAuthReducer() {
     },
     withReducer(
       on(authEvents.logout, () => ({
-        tokens: null,
+        data: null,
         isInitialized: true,
       })),
       on(authEvents.refreshToken, () => ({
         ...setPending(authApiStatusNames.refresh),
       })),
       on(authApiEvents.refreshTokenSuccess, ({ payload }) => ({
-        tokens: payload.tokens,
+        data: payload.data,
         isInitialized: true,
         ...setFulfilled(authApiStatusNames.refresh),
       })),
       on(authApiEvents.refreshTokenFailure, ({ payload }) => ({
-        tokens: null,
+        data: null,
         isInitialized: true,
         ...setError(payload.error, authApiStatusNames.refresh),
       })),
@@ -32,12 +32,12 @@ export function withAuthReducer() {
         ...setPending(authApiStatusNames.login),
       })),
       on(authApiEvents.loginSuccess, ({ payload }) => ({
-        tokens: payload.tokens,
+        data: payload.data,
         isInitialized: true,
         ...setFulfilled(authApiStatusNames.login),
       })),
       on(authApiEvents.loginFailure, ({ payload }) => ({
-        tokens: null,
+        data: null,
         isInitialized: true,
         ...setError(payload.error, authApiStatusNames.login),
       })),

@@ -29,14 +29,16 @@ type HttpOptions = {
     | boolean;
 };
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class HttpService {
   readonly http = inject(HttpClient);
   readonly headers = new HttpHeaders({ 'Content-Type': 'application/json' });
   readonly options = { headers: this.headers, withCredentials: true };
-
+  readonly appConfigService = inject(AppConfigService);
   readonly $baseUrl = computed(() => {
-    const config = inject(AppConfigService).$config();
+    const config = this.appConfigService.$config();
     return config.apiBaseUrl;
   });
 

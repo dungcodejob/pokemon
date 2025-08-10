@@ -102,6 +102,7 @@ export class AuthController {
     @Origin() origin: string,
   ) {
     const token = this.getRefreshFromCookieOrBody(req, refreshAccessDto);
+
     const result = await this._authService.refreshToken(token, origin);
     this.saveRefreshCookie(res, result.refreshToken);
     return Result.toSingle(result);

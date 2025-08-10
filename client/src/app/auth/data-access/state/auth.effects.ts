@@ -2,9 +2,9 @@ import { effect, inject, Injector } from '@angular/core';
 import { mapToErrorAction, mapToResponseDataAction } from '@core/http';
 import { patchState, signalStoreFeature, type } from '@ngrx/signals';
 import { Events, withEffects } from '@ngrx/signals/events';
-import { StorageService } from '@shared/services';
-import { exhaustMap, map, of } from 'rxjs';
-import { AuthTokensDto } from '../models';
+import { RedirectService, StorageService } from '@shared/services';
+import { exhaustMap, map, of, tap } from 'rxjs';
+import { AuthResultDto } from '../models';
 import { AuthApi } from './auth.api';
 import { authApiEvents, authEvents } from './auth.event';
 import { AuthState } from './auth.store';
@@ -17,18 +17,19 @@ export function withAuthEffects() {
       (
         store,
         events = inject(Events),
-        storage = inject(StorageService),
+        storageService = inject(StorageService),
         injector = inject(Injector),
-        api = inject(AuthApi),
+        authApi = inject(AuthApi),
+        redirectService = inject(RedirectService),
       ) => {
-        const storageTokens = storage.use<AuthTokensDto>('auth');
+        const storageTokens = storageService.use<AuthResultDto>('auth');
 
         return {
           login: events.on(authEvents.login).pipe(
             exhaustMap(({ payload }) => {
-              return api.login(payload.credentials).pipe(
-                mapToResponseDataAction((tokens) =>
-                  authApiEvents.loginSuccess({ tokens }),
+              return authApi.login(payload.credentials).pipe(
+                mapToResponseDataAction((result) =>
+                  authApiEvents.loginSuccess({ data: result.data }),
                 ),
                 mapToErrorAction((error) =>
                   authApiEvents.loginFailure({
@@ -41,9 +42,9 @@ export function withAuthEffects() {
 
           refreshToken: events.on(authEvents.refreshToken).pipe(
             exhaustMap(({ payload }) => {
-              return api.refresh(payload.refreshToken).pipe(
-                mapToResponseDataAction((tokens) =>
-                  authApiEvents.refreshTokenSuccess({ tokens }),
+              return authApi.refresh(payload.refreshToken).pipe(
+                mapToResponseDataAction((result) =>
+                  authApiEvents.refreshTokenSuccess({ data: result.data }),
                 ),
                 mapToErrorAction((error) =>
                   of(
@@ -60,13 +61,13 @@ export function withAuthEffects() {
             map(() => {
               const localTokens = storageTokens.get();
               if (localTokens) {
-                patchState(store, { tokens: localTokens });
+                patchState(store, { data: localTokens });
               }
 
               effect(
                 () => {
-                  const tokens = store.tokens();
-                  storageTokens.set(tokens);
+                  const data = store.data();
+                  storageTokens.set(data);
                 },
                 { injector },
               );
@@ -80,6 +81,14 @@ export function withAuthEffects() {
               }
             }),
           ),
+
+          redirect: events
+            .on(authApiEvents.loginSuccess, authApiEvents.refreshTokenSuccess)
+            .pipe(
+              tap(() => {
+                redirectService.redirectToSavedUrl();
+              }),
+            ),
         };
       },
     ),

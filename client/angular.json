@@ -47,6 +47,11 @@
                   "glob": "config.json",
                   "input": "src/configurations/production",
                   "output": "configuration/"
+                },
+                {
+                  "glob": "**/*",
+                  "input": "src/assets/",
+                  "output": "/assets/"
                 }
               ],
               "budgets": [
@@ -75,6 +80,11 @@
                   "glob": "config.json",
                   "input": "src/configurations/development",
                   "output": "configuration/"
+                },
+                {
+                  "glob": "**/*",
+                  "input": "src/assets/",
+                  "output": "/assets/"
                 }
               ],
               "optimization": false,

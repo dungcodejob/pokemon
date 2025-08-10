@@ -1,0 +1,122 @@
+<div class="w-screen h-screen">
+  <div class="flex w-full h-full justify-center items-center">
+    <div class="w-[400px] shadow-xl rounded-xl p-5">
+      <div class="flex justify-center py-4">
+        <img alt="logo" class="h-16" src="/assets/images/pokemon-logo.png" />
+      </div>
+
+      <div class="flex flex-col space-y-4">
+        <div class="text-center">
+          <h1 class="text-2xl font-semibold tracking-tight mb-2">
+            Welcome back!
+          </h1>
+          <p class="text-sm text-gray-600">
+            Enter your username or email below to login
+          </p>
+        </div>
+
+        <form
+          nz-form
+          autocomplete="off"
+          class="flex flex-col space-y-6"
+          [formGroup]="loginForm"
+          (ngSubmit)="onSubmit()"
+        >
+          <div class="space-y-4">
+            @if ($error()) {
+              <div class="w-full" hlmAlert variant="destructive">
+                {{ $error() }}
+              </div>
+            }
+
+            <div class="space-y-2">
+              @let usernameOrEmail = loginForm.get("usernameOrEmail");
+              @if (usernameOrEmail) {
+                <nz-form-item>
+                  <nz-form-label [nzSpan]="24" nzFor="usernameOrEmail"
+                    >Username or Email</nz-form-label
+                  >
+                  <nz-form-control [nzSpan]="24" [nzErrorTip]="errorTpl">
+                    <input
+                      type="text"
+                      nz-input
+                      autocapitalize="none"
+                      autocomplete="off"
+                      autocorrect="off"
+                      class="w-full"
+                      formControlName="usernameOrEmail"
+                      id="usernameOrEmail"
+                      placeholder="name@example.com"
+                      type="text"
+                    />
+                  </nz-form-control>
+
+                  <ng-template #errorTpl let-control>
+                    @if (control.errors?.["required"]) {
+                      Please input your username or email!
+                    }
+                  </ng-template>
+                </nz-form-item>
+              }
+            </div>
+
+            <div class="space-y-2">
+              @let password = loginForm.get("password");
+              @if (password) {
+                <nz-form-item>
+                  <nz-form-label [nzSpan]="24" nzFor="password"
+                    >Password</nz-form-label
+                  >
+                  <nz-form-control [nzSpan]="24" [nzErrorTip]="errorTpl">
+                    <nz-input-group nzPrefixIcon="lock">
+                      <input
+                        type="password"
+                        nz-input
+                        id="password"
+                        autocomplete="new-password"
+                        formControlName="password"
+                        placeholder="Password"
+                      />
+                    </nz-input-group>
+                  </nz-form-control>
+
+                  <ng-template #errorTpl let-control>
+                    @if (control.errors?.["required"]) {
+                      Please input your password!
+                    }
+                    @if (control.errors?.["minlength"]) {
+                      Password must be at least
+                      {{ control.errors?.["minlength"].requiredLength }}
+                      characters!
+                    }
+                  </ng-template>
+                </nz-form-item>
+              }
+            </div>
+          </div>
+
+          <button
+            class="w-full"
+            nz-button
+            type="submit"
+            [disabled]="isSubmitDisabled"
+          >
+            @if ($isPending()) {
+              <span>Loading...</span>
+            } @else {
+              <span>Login</span>
+            }
+          </button>
+        </form>
+      </div>
+
+      <div class="flex items-center justify-center gap-1 pt-4" hlmCardFooter>
+        <p class="text-sm text-gray-500">Don't have an account?</p>
+        <a
+          class="text-sm text-blue-600 hover:text-blue-800 font-semibold cursor-pointer"
+          >Sign up</a
+        >
+      </div>
+    </div>
+  </div>
+</div>

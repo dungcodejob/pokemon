@@ -1,11 +1,11 @@
 import { signalStore, withState } from '@ngrx/signals';
 import { NamedStatusState, withStatus } from '@shared/utils';
-import { AuthTokensDto } from '../models/auth-tokens.dto';
+import { AuthResultDto } from '../models/auth-result.dto';
 import { withAuthEffects } from './auth.effects';
 import { withAuthReducer } from './auth.reducer';
 
 export type AuthState = {
-  tokens: AuthTokensDto | null;
+  data: AuthResultDto | null;
   isInitialized: boolean;
 };
 
@@ -19,7 +19,7 @@ export type AuthStateWithStatus = AuthState &
   NamedStatusState<typeof authApiStatusNames.refresh>;
 
 export const authInitialState: AuthState = {
-  tokens: null,
+  data: null,
   isInitialized: false,
 };
 

@@ -1,3 +1,3 @@
-export * from './auth-tokens.dto';
+export * from './auth-result.dto';
 export * from './login-credentials.dto';
 export * from './register.dto';

@@ -29,7 +29,7 @@ export class BacklistService {
     const key = this.createKey(userId, tokenId);
     const time = await this.cacheManager.get<number>(key);
 
-    return isNil(time);
+    return !isNil(time);
   }
 
   private createKey(userId: string, tokenId: string) {

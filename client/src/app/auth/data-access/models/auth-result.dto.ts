@@ -3,7 +3,7 @@ type AuthUserDto = {
   name: string;
 };
 
-export type AuthTokensDto = {
+export type AuthResultDto = {
   accessToken: string;
   refreshToken: string;
   user: AuthUserDto;

@@ -1,18 +1,17 @@
-import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { ResponseDto } from '@core/http';
+import { HttpService, ResponseDto, SingleResponseDto } from '@core/http';
 import { API_ENDPOINTS } from '@shared/constants';
 import { Observable } from 'rxjs';
-import { AuthTokensDto, LoginCredentialsDto, RegisterDto } from '../models';
+import { AuthResultDto, LoginCredentialsDto, RegisterDto } from '../models';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthApi {
-  private readonly _http = inject(HttpClient);
+  private readonly _http = inject(HttpService);
 
-  register(credentials: RegisterDto): Observable<ResponseDto<AuthTokensDto>> {
-    return this._http.post<ResponseDto<AuthTokensDto>>(
+  register(credentials: RegisterDto): Observable<ResponseDto<AuthResultDto>> {
+    return this._http.post<ResponseDto<AuthResultDto>>(
       API_ENDPOINTS.AUTH.REGISTER,
       credentials,
     );
@@ -20,22 +19,22 @@ export class AuthApi {
 
   login(
     credentials: LoginCredentialsDto,
-  ): Observable<ResponseDto<AuthTokensDto>> {
-    return this._http.post<ResponseDto<AuthTokensDto>>(
+  ): Observable<SingleResponseDto<AuthResultDto>> {
+    return this._http.post<SingleResponseDto<AuthResultDto>>(
       API_ENDPOINTS.AUTH.LOGIN,
       credentials,
     );
   }
 
-  refresh(refreshToken: string): Observable<ResponseDto<AuthTokensDto>> {
-    return this._http.post<ResponseDto<AuthTokensDto>>(
+  refresh(refreshToken: string): Observable<SingleResponseDto<AuthResultDto>> {
+    return this._http.post<SingleResponseDto<AuthResultDto>>(
       API_ENDPOINTS.AUTH.REFRESH,
       { refreshToken },
     );
   }
 
-  logout(refreshToken: string): Observable<ResponseDto<void>> {
-    return this._http.post<ResponseDto<void>>(API_ENDPOINTS.AUTH.LOGOUT, {
+  logout(refreshToken: string): Observable<SingleResponseDto<void>> {
+    return this._http.post<SingleResponseDto<void>>(API_ENDPOINTS.AUTH.LOGOUT, {
       refreshToken,
     });
   }

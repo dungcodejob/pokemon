@@ -2,7 +2,7 @@ import { eventGroup } from '@ngrx/signals/events';
 
 import { type } from '@ngrx/signals';
 import { LoginCredentialsDto } from '../models';
-import { AuthTokensDto } from '../models/auth-tokens.dto';
+import { AuthResultDto } from '../models/auth-result.dto';
 
 export const authEvents = eventGroup({
   source: 'Auth Page',
@@ -17,9 +17,9 @@ export const authEvents = eventGroup({
 export const authApiEvents = eventGroup({
   source: 'Auth API',
   events: {
-    loginSuccess: type<{ tokens: AuthTokensDto }>(),
+    loginSuccess: type<{ data: AuthResultDto }>(),
     loginFailure: type<{ error: unknown }>(),
-    refreshTokenSuccess: type<{ tokens: AuthTokensDto }>(),
+    refreshTokenSuccess: type<{ data: AuthResultDto }>(),
     refreshTokenFailure: type<{ error: unknown }>(),
   },
 });

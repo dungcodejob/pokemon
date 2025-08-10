@@ -1,1 +1,1 @@
-export { webShellRoutes } from './web-shell.routes';
+export * from './web-shell.routes';
