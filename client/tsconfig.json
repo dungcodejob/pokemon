@@ -8,6 +8,8 @@
     "paths": {
       "@shell": ["src/app/shell"],
       "@shell/*": ["src/app/shell/*"],
+      "@shared": ["src/app/shared"],
+      "@shared/*": ["src/app/shared/*"],
       "@core": ["src/app/core"],
       "@core/*": ["src/app/core/*"]
     },
