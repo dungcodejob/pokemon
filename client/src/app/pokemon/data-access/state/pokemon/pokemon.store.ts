@@ -33,6 +33,7 @@ export const pokemonApiStatusNames = {
   findTypes: 'findTypes',
   findFavorites: 'findFavorites',
   toggleFavorite: 'toggleFavorite',
+  import: 'import',
 } as const;
 
 export type PokemonStateWithFeature = PokemonState &
@@ -41,6 +42,7 @@ export type PokemonStateWithFeature = PokemonState &
   NamedStatusState<typeof pokemonApiStatusNames.findTypes> &
   NamedStatusState<typeof pokemonApiStatusNames.findFavorites> &
   NamedStatusState<typeof pokemonApiStatusNames.toggleFavorite> &
+  NamedStatusState<typeof pokemonApiStatusNames.import> &
   EntityState<PokemonResultDto>;
 
 export const pokemonInitialState: PokemonStateWithFeature = {
@@ -50,6 +52,7 @@ export const pokemonInitialState: PokemonStateWithFeature = {
   findTypesStatus: { error: null },
   findFavoritesStatus: { error: null },
   toggleFavoriteStatus: { error: null },
+  importStatus: { error: null },
   entityMap: {},
   ids: [],
   name: '',
@@ -73,6 +76,7 @@ export const PKPokemonStore = signalStore(
       pokemonApiStatusNames.findTypes,
       pokemonApiStatusNames.findFavorites,
       pokemonApiStatusNames.toggleFavorite,
+      pokemonApiStatusNames.import,
     ],
   }),
   withPokemonEffects(),

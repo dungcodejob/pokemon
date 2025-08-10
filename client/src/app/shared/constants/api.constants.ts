@@ -11,6 +11,7 @@ export const API_ENDPOINTS = {
     FIND_TYPES: '/pokemon/findTypes',
     FIND_FAVORITES: '/pokemon/findFavorites',
     TOGGLE_FAVORITE: (id: string) => `/pokemon/${id}/favorite`,
+    IMPORT: '/pokemon/import/upload',
   },
   CONFIGURATION: '/configuration',
   ASSETS: '/assets',

@@ -12,6 +12,7 @@ import { API_ENDPOINTS } from '@shared/constants';
 import { delay, Observable } from 'rxjs';
 import {
   PokemonDetailsDto,
+  PokemonImportResultDto,
   PokemonResultDto,
   PokemonTypeResultDto,
 } from '../models';
@@ -62,6 +63,16 @@ export class PKPokemonApi {
     return this._http.post<ResponseDto>(
       API_ENDPOINTS.POKEMON.TOGGLE_FAVORITE(pokemonId),
       null,
+    );
+  }
+
+  import(file: File): Observable<SingleResponseDto<PokemonImportResultDto>> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return this._http.post<SingleResponseDto<PokemonImportResultDto>>(
+      API_ENDPOINTS.POKEMON.IMPORT,
+      formData,
     );
   }
 }

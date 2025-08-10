@@ -2,6 +2,7 @@ import { inject } from '@angular/core';
 import { mapToErrorAction, mapToResponseDataAction } from '@core/http';
 import { signalStoreFeature, type } from '@ngrx/signals';
 import { Events, withEffects } from '@ngrx/signals/events';
+import { NzMessageService } from 'ng-zorro-antd/message';
 import { exhaustMap } from 'rxjs';
 import { PKPokemonApi } from '../pokemon.api';
 import { pokemonApiEvents, pokemonEvents } from './pokemon.event';
@@ -12,7 +13,12 @@ export function withPokemonEffects() {
   return signalStoreFeature(
     { state: type<PokemonStateWithFeature>() },
     withEffects(
-      (store, events = inject(Events), pokemonApi = inject(PKPokemonApi)) => {
+      (
+        store,
+        events = inject(Events),
+        pokemonApi = inject(PKPokemonApi),
+        messageService = inject(NzMessageService),
+      ) => {
         return {
           find: events.on(pokemonEvents.find).pipe(
             exhaustMap(({ payload }) => {
@@ -26,6 +32,23 @@ export function withPokemonEffects() {
                 }),
                 mapToErrorAction((error) =>
                   pokemonApiEvents.findFailure({
+                    error,
+                  }),
+                ),
+              );
+            }),
+          ),
+          import: events.on(pokemonEvents.import).pipe(
+            exhaustMap(({ payload }) => {
+              return pokemonApi.import(payload.file).pipe(
+                mapToResponseDataAction((result) => {
+                  messageService.success('Import success');
+                  return pokemonApiEvents.importSuccess({
+                    data: result.data,
+                  });
+                }),
+                mapToErrorAction((error) =>
+                  pokemonApiEvents.importFailure({
                     error,
                   }),
                 ),

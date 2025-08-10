@@ -34,17 +34,13 @@ type HttpOptions = {
 })
 export class HttpService {
   readonly http = inject(HttpClient);
-  readonly headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-  readonly options = { headers: this.headers, withCredentials: true };
+
+  readonly options = { withCredentials: true };
   readonly appConfigService = inject(AppConfigService);
   readonly $baseUrl = computed(() => {
     const config = this.appConfigService.$config();
     return config.apiBaseUrl;
   });
-
-  // configure(config: EnvConfig): void {
-  //   this.baseUrl = config.baseUrl;
-  // }
 
   get<T extends ResponseDto>(
     url: string,

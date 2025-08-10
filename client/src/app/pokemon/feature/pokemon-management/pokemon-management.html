@@ -26,14 +26,37 @@
       ></nz-switch>
     </div>
     <div nz-col [nzSpan]="8" class="text-right">
-      <input type="file" #fileInput accept=".csv" style="display: none" />
-      <button nz-button nzType="primary" (click)="fileInput.click()">
+      <input 
+        type="file" 
+        #fileInput 
+        accept=".csv" 
+        style="display: none" 
+        (change)="onFileSelected($event)"
+      />
+      <button 
+        nz-button 
+        nzType="primary" 
+        (click)="fileInput.click()"
+        [nzLoading]="$isImportPending()"
+        [disabled]="$isImportPending()">
         <span nz-icon nzType="upload"></span>
         Import CSV
       </button>
     </div>
   </div>
 </div>
+
+@if ($importErrorMessage()) {
+  <div class="mb-4">
+    <nz-alert 
+      nzType="error" 
+      nzMessage="Import Error" 
+      [nzDescription]="$importErrorMessage()" 
+      nzShowIcon 
+      nzCloseable>
+    </nz-alert>
+  </div>
+}
 
 <div nz-row [nzGutter]="[32, 32]">
   @if ($isPending()) {

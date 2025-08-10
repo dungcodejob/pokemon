@@ -39,6 +39,15 @@ export function withPokemonReducer() {
       on(pokemonEvents.setName, ({ payload }) => ({
         ...payload,
       })),
+      on(pokemonEvents.import, () => ({
+        ...setPending(pokemonApiStatusNames.import),
+      })),
+      on(pokemonApiEvents.importSuccess, ({ payload }) => ({
+        ...setFulfilled(pokemonApiStatusNames.import),
+      })),
+      on(pokemonApiEvents.importFailure, ({ payload }) => ({
+        ...setError(payload.error, pokemonApiStatusNames.import),
+      })),
       on(pokemonEvents.setLegendary, ({ payload }) => ({
         ...payload,
       })),

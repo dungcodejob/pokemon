@@ -2,7 +2,11 @@ import { eventGroup } from '@ngrx/signals/events';
 
 import { PaginationDto, PaginationMetaDto } from '@core/http';
 import { type } from '@ngrx/signals';
-import { PokemonResultDto, PokemonTypeResultDto } from '../../models';
+import {
+  PokemonImportResultDto,
+  PokemonResultDto,
+  PokemonTypeResultDto,
+} from '../../models';
 import { PokemonDetailsDto } from '../../models/pokemon-details.dto';
 import { PokemonFilterDto } from '../../models/pokemon-filter.dto';
 
@@ -18,6 +22,8 @@ export const pokemonEvents = eventGroup({
     findFavorites: type<void>(),
 
     toggleFavorite: type<{ id: string }>(),
+
+    import: type<{ file: File }>(),
 
     reset: type<void>(),
 
@@ -52,5 +58,8 @@ export const pokemonApiEvents = eventGroup({
 
     toggleFavoriteSuccess: type<{ data: PokemonResultDto }>(),
     toggleFavoriteFailure: type<{ error: unknown }>(),
+
+    importSuccess: type<{ data: PokemonImportResultDto }>(),
+    importFailure: type<{ error: unknown }>(),
   },
 });

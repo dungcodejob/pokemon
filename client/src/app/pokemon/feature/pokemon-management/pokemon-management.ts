@@ -12,6 +12,7 @@ import { PokemonFilterDto } from '@pokemon/data-access';
 import { PKPokemonCard } from '@pokemon/ui';
 import { ROUTES } from '@shared/constants';
 import { injectAutoEffect } from '@shared/utils';
+import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzIconModule } from 'ng-zorro-antd/icon';
@@ -26,6 +27,7 @@ import { PKPokemonManagementFacade } from './pokemon-management.facade';
   selector: 'app-pokemon-management',
   imports: [
     PKPokemonCard,
+    NzAlertModule,
     NzGridModule,
     NzPaginationModule,
     NzInputModule,
@@ -34,6 +36,7 @@ import { PKPokemonManagementFacade } from './pokemon-management.facade';
     FormsModule,
     NzSpinModule,
     NzSwitchModule,
+    NzAlertModule,
   ],
   providers: [PKPokemonManagementFacade],
   templateUrl: './pokemon-management.html',
@@ -59,11 +62,15 @@ export class PKPokemonManagement implements OnInit {
   $typeIds = this._pokemonManagementFacade.$typeIds;
   $sortBy = this._pokemonManagementFacade.$sortBy;
   $sortOrder = this._pokemonManagementFacade.$sortOrder;
+  $isImportPending = this._pokemonManagementFacade.$isImportPending;
+  $isImportFulfilled = this._pokemonManagementFacade.$isImportFulfilled;
+  $importErrorMessage = this._pokemonManagementFacade.$importErrorMessage;
 
   registerLink = ROUTES.REGISTER;
 
   ngOnInit(): void {
     this.registerFilterChangeEffect();
+    this.registerImportSuccessEffect();
     this.syncFilterToUrl();
     this.listenSearchKeyChange();
   }
@@ -96,6 +103,19 @@ export class PKPokemonManagement implements OnInit {
     });
   }
 
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      console.log('Selected file:', file.name);
+
+      this._pokemonManagementFacade.import({ file });
+
+      // Reset the input value so the same file can be selected again
+      input.value = '';
+    }
+  }
+
   private listenSearchKeyChange() {
     this._searchKeySubject
       .pipe(
@@ -120,6 +140,26 @@ export class PKPokemonManagement implements OnInit {
         },
       };
       this._pokemonManagementFacade.find({ filter });
+    });
+  }
+
+  private registerImportSuccessEffect() {
+    this._autoEffect(() => {
+      const isImportPending = this.$isImportPending();
+      const isImportFulfilled = this.$isImportFulfilled();
+
+      if (!isImportPending && isImportFulfilled) {
+        const filter: PokemonFilterDto = {
+          name: this.$searchValue(),
+          legendary: this.$legendary(),
+          typeIds: this.$typeIds() ?? undefined,
+          pagination: {
+            currentPage: this.$currentPage(),
+            pageSize: this.$pageSize(),
+          },
+        };
+        this._pokemonManagementFacade.find({ filter });
+      }
     });
   }
 

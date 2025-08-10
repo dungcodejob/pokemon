@@ -27,6 +27,11 @@ export const PKPokemonManagementFacade = signalStore(
     $totalCount: computed(() => _pokemonStore.totalCount()),
     $pageSize: computed(() => _pokemonStore.pageSize()),
     $currentPage: computed(() => _pokemonStore.currentPage()),
+    $isImportPending: computed(() => _pokemonStore.$isImportPending()),
+    $isImportFulfilled: computed(() => _pokemonStore.$isImportFulfilled()),
+    $importErrorMessage: computed(() =>
+      errorToString(_pokemonStore.$importError()),
+    ),
   })),
   withMethods(({ _pokemonStore, _pokemonDispatch: _dispatch }) => ({
     find: _dispatch.find,
@@ -34,5 +39,6 @@ export const PKPokemonManagementFacade = signalStore(
     setPagination: _dispatch.setPagination,
     setName: _dispatch.setName,
     setLegendary: _dispatch.setLegendary,
+    import: _dispatch.import,
   })),
 );

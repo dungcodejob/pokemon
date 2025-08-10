@@ -14,7 +14,7 @@ export const webShellRoutes: Routes = [
     component: PKLayout,
     children: [
       {
-        path: 'dashboard',
+        path: '',
         loadChildren: () =>
           import('@dashboard/feature').then((mod) => mod.DashboardShellRoutes),
       },
